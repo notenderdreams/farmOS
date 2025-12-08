@@ -8,6 +8,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 enable_testing()
 
-add_subdirectory(core)
-add_subdirectory(cli)
-add_subdirectory(test)
+add_subdirectory(src/core)
+add_subdirectory(src/cli)
+add_subdirectory(tests)
