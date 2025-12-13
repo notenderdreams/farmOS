@@ -223,12 +223,4 @@ Explanation:
  deletePerson    -> function that runs
 ```
 
-The inner part is a `CommandDef`.
-
----
-
-## Final Notes (READ THIS)
-
-* Every command function **must** accept `(const Args& args)`
-* Use `loadArg` for required arguments
-* Use `getArg` for optional arguments
+The description and function are part of `CommandDef`.
