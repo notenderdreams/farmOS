@@ -46,7 +46,7 @@ struct ModuleDef
 class CLI
 {
 public:
-    explicit CLI(std::string app_name);
+    explicit CLI(const std::string& app_name);
 
     void registerModule(const ModuleDef& module);
     int run(int argc, char** argv);
@@ -55,7 +55,8 @@ private:
     const ModuleDef* findModule(const std::string& name) const ;
     const CommandDef* findCommand(const ModuleDef& module,
                                   const std::string& name) const ;
-    void help() const;
+    void showHelp() const;
+    void showModuleHelp(const ModuleDef& module) const;    
     std::string app_name_;
     std::unordered_map<std::string, ModuleDef> modules_;
 };
