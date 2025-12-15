@@ -193,8 +193,26 @@ struct CommandDef
 
 ---
 
-## Registering a Module (Simple Way)
+## Registering a Module (Manual Way)
+```cpp
+ModuleDef person;
+person.name = "person";
+person.description = "Manage persons";
 
+person.commands["add"] = {
+    "Add a person",
+    addPerson
+};
+
+person.commands["delete"] = {
+    "Delete a person",
+    deletePerson
+};
+
+cli.registerModule(person);
+
+```
+Or in short 
 ```cpp
 cli.registerModule({
     "person",           // module name
@@ -224,3 +242,29 @@ Explanation:
 ```
 
 The description and function are part of `CommandDef`.
+
+
+## Registering a Module ( Using Macros)  - RECOMMENDED
+**MODULE** takes
+  - instance of the cli 
+  - Module name 
+  - And some description 
+
+
+**CMD** takes 
+  - command name ( just the word , not string)
+  - description 
+  - the actual function 
+
+
+```cpp
+MODULE(cli, person, "Manage persons") {
+    CMD(add,    "Add a person",    addPerson);
+    CMD(delete, "Delete a person", deletePerson);
+}
+
+MODULE(cli, employee, "Manage employees") {
+    CMD(add,    "Add an employee",    addEmployee);
+    CMD(remove, "Remove an employee", removeEmployee);
+}
+```

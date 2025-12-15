@@ -19,14 +19,21 @@ int addPerson(const Args& args)
 }
 
 void setupCli(CLI& cli) {
-    cli.registerModule({
-        "person",
-        "Manage persons",
-        {
-            { "delete", { "Delete a person",  deletePerson }},
-            { "add", {"Add a person", addPerson}}
-        }
-    });
+    //cli.registerModule({
+    //    "person",
+    //    "Manage persons",
+    //    {
+    //        { "delete", { "Delete a person",  deletePerson }},
+    //        { "add", {"Add a person", addPerson}}
+    //    }
+    //});
+
+	REG_MOD(cli, person, "Manage persons") 
+    {
+		ADD_CMD(add, "Add a person", addPerson);
+		ADD_CMD(delete, "Delete a person", deletePerson);
+	}
+
 }
 
 int main(int argc, char** argv) {
