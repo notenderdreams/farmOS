@@ -4,21 +4,12 @@
 #include <vector> 
 
 
-TransactionService::TransactionService(sqlite3* db) : db(db) {}
+TransactionService::TransactionService(sqlite3* db) : Database(db) {}
+TransactionService::TransactionService(const std::string& db_path) : Database(db_path) {}
 
 void TransactionService::initTable()
 {
-    char* err = nullptr;
-    if(sqlite3_exec(
-        db,std::string(farmos::models::TRANSACTIONS_TABLE).c_str(),
-        nullptr,
-        nullptr,
-        &err
-    )!= SQLITE_OK){
-        std::string msg = err;
-        sqlite3_free(err);
-        throw std::runtime_error(msg);
-    }
+    execute(std::string(farmos::models::TRANSACTIONS_TABLE));
 } 
 
 void TransactionService::addTransaction(const Transaction& tx)
@@ -31,12 +22,7 @@ void TransactionService::addTransaction(const Transaction& tx)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     )";
 
-    sqlite3_stmt* stmt = nullptr;
-    if(sqlite3_prepare_v2(
-        db, sql, -1, &stmt, nullptr
-    ) != SQLITE_OK){
-        throw std::runtime_error("DB: Failed to prepare statement ");
-    }
+    sqlite3_stmt* stmt = prepare(sql);
 
     sqlite3_bind_text(stmt, 1, Transaction::toStr(tx.type), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 2, Transaction::toStr(tx.direction), -1, SQLITE_TRANSIENT);
@@ -57,13 +43,7 @@ void TransactionService::addTransaction(const Transaction& tx)
 std::vector<Transaction> TransactionService::getAllTransactions()
 {
     const char* sql = "SELECT * FROM transactions;";
-    sqlite3_stmt* stmt = nullptr;
-
-    if(sqlite3_prepare_v2(
-        db, sql, -1, &stmt, nullptr
-    ) != SQLITE_OK){
-        throw std::runtime_error("DB: Failed to prepare statement ");
-    }
+    sqlite3_stmt* stmt = prepare(sql);
 
     std::vector<Transaction> transactions;
 
@@ -89,13 +69,7 @@ std::vector<Transaction> TransactionService::getAllTransactions()
 Transaction TransactionService::getTransactionById(i64 tid)
 {
     const char* sql = "SELECT * FROM transactions WHERE t_id = ?;";
-    sqlite3_stmt* stmt = nullptr;
-
-    if(sqlite3_prepare_v2(
-        db, sql, -1, &stmt, nullptr
-    ) != SQLITE_OK){
-        throw std::runtime_error("DB: Failed to prepare statement ");
-    }
+    sqlite3_stmt* stmt = prepare(sql);
 
     sqlite3_bind_int64(stmt, 1, tid);
 
@@ -121,11 +95,7 @@ Transaction TransactionService::getTransactionById(i64 tid)
 void TransactionService::updateStatus(i64 tid, TransactionStatus new_status)
 {
     const char* sql = "UPDATE transactions SET status = ? WHERE t_id = ?;";
-    sqlite3_stmt* stmt = nullptr;
-
-    if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK){
-        throw std::runtime_error("DB: Failed to prepare statement ");
-    }
+    sqlite3_stmt* stmt = prepare(sql);
 
     sqlite3_bind_text(stmt, 1, Transaction::toStr(new_status), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int64(stmt, 2, tid);
