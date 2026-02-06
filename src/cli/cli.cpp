@@ -23,7 +23,7 @@ namespace
 }
 
 CLI::CLI(const std::string& app_name)
-	: app_name_(app_name) {
+	: _app_name(app_name) {
 }
 
 void CLI::registerModule(const ModuleDef& module)
@@ -53,7 +53,7 @@ int CLI::run(int argc, char** argv)
 {
 	if (argc < 2) {
 		printError("No arguments provided.");
-		std::cout << "Use '" << app_name_ << " help' for usage information.\n";
+		std::cout << "Use '" << _app_name << " help' for usage information.\n";
 		return 1;
 	}
 
@@ -75,7 +75,7 @@ int CLI::run(int argc, char** argv)
 
 	if (argc < 3) {
 		printError("Both module and command must be specified.");
-		std::cout << "Usage: " << app_name_ << " <module> <command> [args...]\n";
+		std::cout << "Usage: " << _app_name << " <module> <command> [args...]\n";
 		return 1;
 	}
 
@@ -85,14 +85,14 @@ int CLI::run(int argc, char** argv)
 	const ModuleDef* module = findModule(mod_name);
 	if (!module) {
 		printError("Module '" + mod_name + "' not found.");
-		std::cout << "Use '" << app_name_ << " help' to see available modules.\n";
+		std::cout << "Use '" << _app_name << " help' to see available modules.\n";
 		return 1;
 	}
 
 	const CommandDef* command = findCommand(*module, cmd_name);
 	if (!command) {
 		printError("Command '" + cmd_name + "' not found in module '" + mod_name + "'.");
-		std::cout << "Use '" << app_name_ << " help " << mod_name << "' to see available commands.\n";
+		std::cout << "Use '" << _app_name << " help " << mod_name << "' to see available commands.\n";
 		return 1;
 	}
 
@@ -111,8 +111,8 @@ int CLI::run(int argc, char** argv)
 
 void CLI::showHelp() const
 {
-	std::cout << app_name_ << "\n";
-	std::cout << "Usage: " << app_name_ << " <module> <command> [args...]\n";
+	std::cout << _app_name << "\n";
+	std::cout << "Usage: " << _app_name << " <module> <command> [args...]\n";
 	std::cout << "Modules:\n";
 	for (const auto& mod : modules_) {
 		showModuleHelp(mod.second);

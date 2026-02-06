@@ -57,7 +57,7 @@ private:
                                   const std::string& name) const ;
     void showHelp() const;
     void showModuleHelp(const ModuleDef& module) const;    
-    std::string app_name_;
+    std::string _app_name;
     std::unordered_map<std::string, ModuleDef> modules_;
 };
 
@@ -67,27 +67,27 @@ public:
     ModuleBuilder(CLI& cli,
         std::string name,
         std::string desc
-    ) : cli_(cli),
-        name_(std::move(name)),
-        desc_(std::move(desc)) {
+    ) : _cli(cli),
+        _name(std::move(name)),
+        _desc(std::move(desc)) {
     }
 
     void cmd(const std::string& name,
         const std::string& desc,
         std::function<int(const Args&)>fn
     ) {
-        cmds_[name] = { desc,fn };
+        _cmds[name] = { desc,fn };
     }
 
     ~ModuleBuilder()
     {
-        cli_.registerModule({ name_,desc_,cmds_ });
+        _cli.registerModule({ _name,_desc,_cmds });
     }
 
 private:
-    CLI& cli_;
-    std::string name_;
-    std::string desc_;
-    std::unordered_map<std::string, CommandDef>cmds_;
+    CLI& _cli;
+    std::string _name;
+    std::string _desc;
+    std::unordered_map<std::string, CommandDef>_cmds;
             
 };
