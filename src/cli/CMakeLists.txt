@@ -1,9 +1,9 @@
-add_executable(farmOS_cli
-    main.cpp cli.cpp
+add_executable(cli
+    main.cpp
+    cli.cpp
 )
 
-# Link the CLI executable against the core static library.
-target_link_libraries(farmOS_cli
+target_link_libraries(cli
     PRIVATE
         farmOS_core
 )

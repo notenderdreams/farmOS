@@ -9,6 +9,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(farmOS_tests
     test_add.cpp
+    test_db.cpp
 )
 
 target_link_libraries(farmOS_tests

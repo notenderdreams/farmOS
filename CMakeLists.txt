@@ -10,4 +10,5 @@ enable_testing()
 
 add_subdirectory(src/core)
 add_subdirectory(src/cli)
+add_subdirectory(src/deps)
 add_subdirectory(tests)
