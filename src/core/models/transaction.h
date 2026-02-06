@@ -1,5 +1,7 @@
 #pragma once 
 #include <string>
+#include <stdexcept>
+#include "core/types.h"
 
 enum class TransactionType 
 {
@@ -31,11 +33,11 @@ enum class TransactionEntityType
 
 struct Transaction
 {
-	size_t tid ;
+	i64 tid ;
 	TransactionType type;
 	TransactionDirection direction;
 
-	double amount;
+	f64 amount;
 	
 	TransactionEntityType entity_type;
 	std::string entity_id;
@@ -103,3 +105,38 @@ struct Transaction
 		}
 	}
 };
+
+
+namespace tx{
+	inline TransactionType stt(const std::string& s)
+	{
+		if(s == "BUY") return TransactionType::BUY;
+		if(s == "SELL") return TransactionType::SELL;
+		if(s == "SALARY") return TransactionType::SALARY;
+		if(s == "BILLS") return TransactionType::BILLS;
+		throw std::runtime_error("Invalid transaction type string: " + s);
+	}
+
+	inline TransactionStatus sts(const std::string& s)
+	{
+		if(s == "COMPLETED") return TransactionStatus::COMPLETED;
+		if(s == "PENDING") return TransactionStatus::PENDING;
+		if(s == "CANCELLED") return TransactionStatus::CANCELLED;
+		throw std::runtime_error("Invalid transaction status string: " + s);
+	}
+
+	inline TransactionEntityType ste(const std::string& s)
+	{
+		if(s == "ANIMAL") return TransactionEntityType::ANIMAL;
+		if(s == "EMPLOYEE") return TransactionEntityType::EMPLOYEE;
+		if(s == "GOODS") return TransactionEntityType::GOODS;
+		throw std::runtime_error("Invalid transaction entity type string: " + s);
+	}
+
+	inline TransactionDirection stdi(const std::string& s)
+	{
+		if(s == "IN") return TransactionDirection::IN;
+		if(s == "OUT") return TransactionDirection::OUT;
+		throw std::runtime_error("Invalid transaction direction string: " + s);
+	}
+}

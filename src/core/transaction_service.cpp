@@ -1,6 +1,7 @@
 #include "core/transaction_service.h"
 #include "models/schema.h"
 #include <stdexcept>
+#include <vector> 
 
 
 TransactionService::TransactionService(sqlite3* db) : db(db) {}
@@ -51,4 +52,68 @@ void TransactionService::addTransaction(const Transaction& tx)
         throw std::runtime_error("DB: Failed ot insert the transaciton");
     }
     sqlite3_finalize(stmt);
+}
+
+std::vector<Transaction> TransactionService::getAllTransactions()
+{
+    const char* sql = "SELECT * FROM transactions;";
+    sqlite3_stmt* stmt = nullptr;
+
+    if(sqlite3_prepare_v2(
+        db, sql, -1, &stmt, nullptr
+    ) != SQLITE_OK){
+        throw std::runtime_error("DB: Failed to prepare statement ");
+    }
+
+    std::vector<Transaction> transactions;
+
+    while(sqlite3_step(stmt) == SQLITE_ROW){
+        Transaction t;
+        t.tid = sqlite3_column_int64(stmt, 0);
+        t.type = tx::stt(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
+        t.direction = tx::stdi(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
+        t.amount = sqlite3_column_double(stmt, 3);  
+        t.entity_type = tx::ste(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4)));
+        t.entity_id = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        t.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+        t.date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 7));
+        t.status = tx::sts(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 8)));
+
+        transactions.push_back(t);
+
+    }
+    sqlite3_finalize(stmt);
+    return transactions;
+}
+
+Transaction TransactionService::getTransactionById(i64 tid)
+{
+    const char* sql = "SELECT * FROM transactions WHERE t_id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+
+    if(sqlite3_prepare_v2(
+        db, sql, -1, &stmt, nullptr
+    ) != SQLITE_OK){
+        throw std::runtime_error("DB: Failed to prepare statement ");
+    }
+
+    sqlite3_bind_int64(stmt, 1, tid);
+
+    Transaction t;
+    if(sqlite3_step(stmt) == SQLITE_ROW){
+        t.tid = sqlite3_column_int64(stmt, 0);
+        t.type = tx::stt(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
+        t.direction = tx::stdi(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
+        t.amount = sqlite3_column_double(stmt, 3);  
+        t.entity_type = tx::ste(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4)));
+        t.entity_id = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        t.description = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+        t.date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 7));
+        t.status = tx::sts(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 8)));
+    } else {
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("DB: No transaction found with the given ID");
+    }
+    sqlite3_finalize(stmt);
+    return t;
 }

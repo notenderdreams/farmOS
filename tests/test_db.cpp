@@ -46,3 +46,72 @@ TEST_F(DbTest, insertsTransaction)
 
     EXPECT_EQ(count, 1);
 }
+
+
+
+TEST_F(DbTest, getAllTransactions)
+{
+    Transaction tx1{};
+    tx1.type = TransactionType::BUY;
+    tx1.direction = TransactionDirection::OUT;
+    tx1.amount = 50.0;
+    tx1.entity_type = TransactionEntityType::GOODS;
+    tx1.entity_id = "101";
+    tx1.description = "Seeds";
+    tx1.date = "2026-02-06";
+    tx1.status = TransactionStatus::COMPLETED;
+
+    Transaction tx2{};
+    tx2.type = TransactionType::SELL;
+    tx2.direction = TransactionDirection::IN;
+    tx2.amount = 120.0;
+    tx2.entity_type = TransactionEntityType::ANIMAL;
+    tx2.entity_id = "202";
+    tx2.description = "Sheep sold";
+    tx2.date = "2026-02-06";
+    tx2.status = TransactionStatus::COMPLETED;
+
+    EXPECT_NO_THROW(service->addTransaction(tx1));
+    EXPECT_NO_THROW(service->addTransaction(tx2));
+
+    std::vector<Transaction> transactions;
+    EXPECT_NO_THROW(transactions = service->getAllTransactions());
+
+    EXPECT_EQ(transactions.size(), 2);
+
+    EXPECT_EQ(transactions[0].type, TransactionType::BUY);
+    EXPECT_EQ(transactions[0].amount, 50.0);
+    EXPECT_EQ(transactions[0].entity_type, TransactionEntityType::GOODS);
+
+    EXPECT_EQ(transactions[1].type, TransactionType::SELL);
+    EXPECT_EQ(transactions[1].amount, 120.0);
+    EXPECT_EQ(transactions[1].entity_type, TransactionEntityType::ANIMAL);
+}
+
+TEST_F(DbTest, getTransactionById)
+{
+    Transaction tx{};
+    tx.type = TransactionType::SALARY;
+    tx.direction = TransactionDirection::OUT;
+    tx.amount = 1000.0;
+    tx.entity_type = TransactionEntityType::EMPLOYEE;
+    tx.entity_id = 1;
+    tx.description = "Employee salary";
+    tx.date = "2026-02-06";
+    tx.status = TransactionStatus::COMPLETED;
+
+    EXPECT_NO_THROW(service->addTransaction(tx));
+
+    std::vector<Transaction> allTx = service->getAllTransactions();
+    ASSERT_EQ(allTx.size(), 1);
+    i64 txId = allTx[0].tid;
+
+    Transaction fetchedTx;
+    EXPECT_NO_THROW(fetchedTx = service->getTransactionById(txId));
+
+    EXPECT_EQ(fetchedTx.tid, txId);
+    EXPECT_EQ(fetchedTx.type, TransactionType::SALARY);
+    EXPECT_EQ(fetchedTx.amount, 1000.0);
+    EXPECT_EQ(fetchedTx.entity_type, TransactionEntityType::EMPLOYEE);
+    EXPECT_EQ(fetchedTx.description, "Employee salary");
+}
