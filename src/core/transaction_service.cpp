@@ -24,15 +24,14 @@ void TransactionService::addTransaction(const Transaction& tx)
 
     sqlite3_stmt* stmt = prepare(sql);
 
-    sqlite3_bind_text(stmt, 1, Transaction::toStr(tx.type), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, Transaction::toStr(tx.direction), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, tx::toStr(tx.type), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, tx::toStr(tx.direction), -1, SQLITE_TRANSIENT);
     sqlite3_bind_double(stmt, 3, tx.amount);
-    sqlite3_bind_text(stmt, 4, Transaction::toStr(tx.entity_type), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, tx::toStr(tx.entity_type), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 5, tx.entity_id.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 6, tx.description.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 7, tx.date.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 8, Transaction::toStr(tx.status), -1, SQLITE_TRANSIENT);
-
+    sqlite3_bind_text(stmt, 8, tx::toStr(tx.status), -1, SQLITE_TRANSIENT);
     if(sqlite3_step(stmt) != SQLITE_DONE){
         sqlite3_finalize(stmt);
         throw std::runtime_error("DB: Failed ot insert the transaciton");
@@ -97,7 +96,7 @@ void TransactionService::updateStatus(i64 tid, TransactionStatus new_status)
     const char* sql = "UPDATE transactions SET status = ? WHERE t_id = ?;";
     sqlite3_stmt* stmt = prepare(sql);
 
-    sqlite3_bind_text(stmt, 1, Transaction::toStr(new_status), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 1, tx::toStr(new_status), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int64(stmt, 2, tid);
 
     if(sqlite3_step(stmt) != SQLITE_DONE){

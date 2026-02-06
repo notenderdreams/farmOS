@@ -46,68 +46,36 @@ struct Transaction
 	std::string date; // YYYY-MM-DD
 	TransactionStatus status = TransactionStatus::COMPLETED;
 
-	static const char* toStr(TransactionType t) 
-	{
-		switch (t)
-		{
-		case TransactionType::BUY:
-			return "BUY";
-		case TransactionType::SELL:
-			return "SELL";
-		case TransactionType::SALARY:
-			return "SALARY";
-		case TransactionType::BILLS:
-			return "BILLS";
-		default:
-			return "UNKNOWN";
-		}
-	}
-	
-	static const char* toStr(TransactionStatus s)
-	{
-		switch (s)
-		{
-		case TransactionStatus::COMPLETED:
-			return "COMPLETED";
-		case TransactionStatus::PENDING:
-			return "PENDING";
-		case TransactionStatus::CANCELLED:
-			return "CANCELLED";
-		default:
-			return "UNKNOWN";
-		}
-	}
-	
-	static const char* toStr(TransactionEntityType e)
-	{
-		switch (e)
-		{
-		case TransactionEntityType::ANIMAL:
-			return "ANIMAL";
-		case TransactionEntityType::EMPLOYEE:
-			return "EMPLOYEE";
-		case TransactionEntityType::GOODS:
-			return "GOODS";
-		default:
-			return "UNKNOWN";
-		}
-	}
-	static const char* toStr(TransactionDirection d)
-	{
-		switch (d)
-		{
-		case TransactionDirection::IN:
-			return "IN";
-		case TransactionDirection::OUT:
-			return "OUT";
-		default:
-			return "UNKNOWN";
-		}
-	}
+
 };
 
 
 namespace tx{
+	extern const char *TransactionTypeStrs[];
+    extern const char *TransactionStatusStrs[];
+    extern const char *TransactionEntityTypeStrs[];
+    extern const char *TransactionDirectionStrs[];
+
+    static const char* toStr(TransactionType t) 
+    {
+        return TransactionTypeStrs[static_cast<int>(t)];
+    }
+    
+    static const char* toStr(TransactionStatus s)
+    {
+        return TransactionStatusStrs[static_cast<int>(s)];
+    }
+    
+    static const char* toStr(TransactionEntityType e)
+    {
+        return TransactionEntityTypeStrs[static_cast<int>(e)];
+    }
+
+    static const char* toStr(TransactionDirection d)
+    {
+        return TransactionDirectionStrs[static_cast<int>(d)];
+    }
+	
 	inline TransactionType stt(const std::string& s)
 	{
 		if(s == "BUY") return TransactionType::BUY;

@@ -2,6 +2,7 @@ add_library(farmOS_core STATIC
     farm_os.cpp
     transaction_service.cpp
     database.cpp
+    models/transaction.cpp
 )
 
 target_include_directories(farmOS_core
