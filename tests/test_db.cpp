@@ -47,8 +47,6 @@ TEST_F(DbTest, insertsTransaction)
     EXPECT_EQ(count, 1);
 }
 
-
-
 TEST_F(DbTest, getAllTransactions)
 {
     Transaction tx1{};
@@ -114,4 +112,34 @@ TEST_F(DbTest, getTransactionById)
     EXPECT_EQ(fetchedTx.amount, 1000.0);
     EXPECT_EQ(fetchedTx.entity_type, TransactionEntityType::EMPLOYEE);
     EXPECT_EQ(fetchedTx.description, "Employee salary");
+}
+
+TEST_F(DbTest, updateTransactionStatus) {
+    Transaction tx{};
+    tx.type = TransactionType::BILLS;
+    tx.direction = TransactionDirection::OUT;
+    tx.amount = 200.0;
+    tx.entity_type = TransactionEntityType::GOODS;
+    tx.entity_id = "1";
+    tx.description = "Fertilizer bill";
+    tx.date = "2026-02-06";
+    tx.status = TransactionStatus::PENDING;
+
+    EXPECT_NO_THROW(service->addTransaction(tx));
+
+    auto allTx = service->getAllTransactions();
+    ASSERT_EQ(allTx.size(), 1);
+
+    i64 txId = allTx[0].tid;
+    EXPECT_EQ(allTx[0].status, TransactionStatus::PENDING);
+
+    EXPECT_NO_THROW(service->updateStatus(txId, TransactionStatus::COMPLETED));
+
+    Transaction updatedTx = service->getTransactionById(txId);
+    EXPECT_EQ(updatedTx.status, TransactionStatus::COMPLETED);
+}
+
+TEST_F(DbTest, updateStatusInvalidId) {
+    i64 invalidId = 67; 
+    EXPECT_THROW(service->updateStatus(invalidId, TransactionStatus::COMPLETED), std::runtime_error);
 }

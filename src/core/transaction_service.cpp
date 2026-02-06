@@ -117,3 +117,28 @@ Transaction TransactionService::getTransactionById(i64 tid)
     sqlite3_finalize(stmt);
     return t;
 }
+
+void TransactionService::updateStatus(i64 tid, TransactionStatus new_status)
+{
+    const char* sql = "UPDATE transactions SET status = ? WHERE t_id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK){
+        throw std::runtime_error("DB: Failed to prepare statement ");
+    }
+
+    sqlite3_bind_text(stmt, 1, Transaction::toStr(new_status), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(stmt, 2, tid);
+
+    if(sqlite3_step(stmt) != SQLITE_DONE){
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("DB: Failed to update transaction status");
+    }
+
+    if(sqlite3_changes(db) == 0){
+        sqlite3_finalize(stmt);
+        throw std::runtime_error("DB: No transaction found with the given ID");
+    }
+
+    sqlite3_finalize(stmt);
+}
