@@ -2,13 +2,14 @@
 #define APPLICANT_H
 
 #include <string>
-#include "HiringAndRoles.h"   
+#include "HR_Roles.h" // <-- include RequiredSkill here
 using namespace std;
 
 enum class ApplicantStatus { Inactive, Active, Rejected };
 enum class EmploymentType { FullTime, PartTime, Contract };
 
-class HRManager;  
+class HRManager; // friend class declaration
+class JobVacancy; // forward declaration is fine here
 
 class Applicant {
 private:
@@ -16,7 +17,7 @@ private:
     string vacancyId;
     string jobTitle;
     string department;
-    RequiredSkill skills;
+    RequiredSkill skills;  // Now RequiredSkill is fully defined
     EmploymentType employmentType;
     ApplicantStatus status;
 
