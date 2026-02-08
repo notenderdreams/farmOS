@@ -2,13 +2,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "AttendenceAndShift.h"  // For AttendanceManagement
+#include "AttandanceLog.h"
+
+class AttendanceLog;
 
 using namespace std;
 
 // ------------------------ Enums ------------------------
-enum class RoleType { HRManager, AttendanceOfficer, PayrollOfficer, RecruitmentOfficer };
-enum class AttendanceStatus { Present, Absent, OnLeave };
+enum class RoleType { HRManager, AttendanceOfficer, PayrollOfficer, RecruitmentOfficer ,Employee};
 
 // Forward declaration to avoid circular dependency
 class Applicant;
@@ -76,7 +77,7 @@ public:
     virtual void closeVacancy(JobVacancy &vacancy) = 0;
     virtual void verifyDocument(string docName) = 0;
     virtual void shortlistApplicant(vector<Applicant*>& applicants, JobVacancy& vacancy) = 0;
-    virtual void startOnboarding(string employeeName) = 0;
+    //virtual void startOnboarding(string employeeName) = 0;
     virtual void approveHire(JobVacancy &vacancy)= 0;
     virtual void addEmployee(Applicant* applicant) =0;
     virtual ~HiringOperations() {}
@@ -97,23 +98,26 @@ public:
     // Can't perform
     void verifyDocument(string docName) override {}
     void shortlistApplicant(vector<Applicant*>& applicants, JobVacancy& vacancy) override {}
-    void startOnboarding(string employeeName) override {}
+    //void startOnboarding(string employeeName) override {}
     void addEmployee(Applicant* applicant) override {}
 };
 
 class AttendanceOfficer : public HRRole, public HiringOperations {
 private:
     string name;
-    AttendanceManagement& attendanceSystem;
+    //AttendanceManagement& attendanceSystem;
+    AttendanceLog* log;
+    string attendanceStatusToString(AttendanceStatus status);
 
 public:
-    AttendanceOfficer(string n, AttendanceManagement& system);
+    AttendanceOfficer(string n);
     void displayRole() override;
-
     void verifyDocument(string docName) override;
-    void GiveAttendance(const string& employeeId,
+    void  createAttendanceLog(const string& month);
+    void  markAttendance(const string& employeeName,
+                        const string& employeeId,
                         const string& date,
-                        bool present);
+                        AttendanceStatus status);
 
     // Can't perform
     void createVacancy(string, string, string, float, float, int, string) override {}
@@ -138,5 +142,5 @@ public:
     void closeVacancy(JobVacancy &) override {}
     void approveHire(JobVacancy&) override {}
     void verifyDocument(string) override {}
-    void startOnboarding(string) override {}
+   // void startOnboarding(string) override {}
 };

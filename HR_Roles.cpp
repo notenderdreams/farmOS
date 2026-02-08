@@ -1,6 +1,7 @@
 #include "HR_Roles.h"
 #include "Applicant.h"   // Full definition needed to call methods
 #include <iostream>
+#include"AttandanceLog.h"
 using namespace std;
 
 // ------------------------ RequiredSkill ------------------------
@@ -61,8 +62,8 @@ void HRManager::displayRole() { cout << name << " is an HR Manager.\n"; }
 
 
 // ------------------------ AttendanceOfficer ------------------------
-AttendanceOfficer::AttendanceOfficer(string n, AttendanceManagement& system)
-    : HRRole(n, RoleType::AttendanceOfficer), name(n), attendanceSystem(system) {}
+AttendanceOfficer::AttendanceOfficer(string n)
+    : HRRole(n, RoleType::AttendanceOfficer), name(n) {}
 
 void AttendanceOfficer::displayRole() { cout << name << " is an Attendance Officer.\n"; }
 
@@ -70,42 +71,48 @@ void AttendanceOfficer::verifyDocument(string docName) {
     if (!canVerifyDocuments()) { cout << "Access Denied!\n"; return; }
     cout << name << " verified document: " << docName << endl;
 }
-
-void AttendanceOfficer::GiveAttendance(const string& employeeId,
-                                       const string& date,
-                                       bool present) {
-    AttendanceStatus status = present ? AttendanceStatus::Present : AttendanceStatus::Absent;
-    attendanceSystem.addAttendance(employeeId, date, status);
-    cout << name << " marked attendance for "
-         << employeeId << " on " << date
-         << " as " << (present ? "Present" : "Absent") << endl;
-}
-
-// ------------------------ RecruitmentOfficer ------------------------
-RecruitmentOfficer::RecruitmentOfficer(string n) : HRRole(n, RoleType::RecruitmentOfficer) {}
-void RecruitmentOfficer::displayRole() { cout << name << " is a Recruitment Officer.\n"; }
-
-// ------------------------ JobVacancy ------------------------
-JobVacancy::JobVacancy(string id, string title, string dept, RequiredSkill reqSkill)
-    : vacancyId(id), jobTitle(title), department(dept), skills(reqSkill), published(false) {}
-
-void JobVacancy::display() {
-    cout << "Vacancy ID: " << vacancyId
-         << " | Job: " << jobTitle
-         << " | Dept: " << department
-         << " | Published: " << (published ? "Yes" : "No") << endl;
-    skills.display();
-    if (!shortlistedApplicants.empty()) {
-        cout << "Shortlisted Applicants: ";
-        for (auto& app : shortlistedApplicants)
-            cout << app->getName() << " ";
-        cout << endl;
+void AttendanceOfficer::createAttendanceLog(const string& month) {
+    if (AttendanceLog::getInstance() != nullptr) {
+        cout << "Attendance log already exists.\n";
+        return;
     }
+    log = new AttendanceLog(month);          // officer's private pointer
+    AttendanceLog::instance = log;           // static singleton pointer
+    cout << "Attendance log for " << month << " created.\n";
 }
 
+void AttendanceOfficer::markAttendance(const string& employeeName,
+                                       const string& employeeId,
+                                       const string& date,
+                                       AttendanceStatus status)
+{
+    AttendanceLog* logInstance = AttendanceLog::getInstance(); // get the singleton
+    if (!logInstance) {
+        cout << "Attendance log not created yet!\n";
+        return;
+    }
+
+    AttendanceRecord rec;
+    rec.date = date;
+    rec.employeeName = employeeName;
+    rec.employeeId = employeeId;
+    rec.status = status;
+
+    logInstance->writeRecord(rec);  // write using singleton
+    cout << "Marked attendance for " << employeeName
+         << " on " << date << " as "
+         << attendanceStatusToString(status) << endl;
+}
+
+string AttendanceOfficer::attendanceStatusToString(AttendanceStatus status) {
+    switch (status) {
+        case AttendanceStatus::Present: return "Present";
+        case AttendanceStatus::Absent: return "Absent";
+    }
+    return "Unknown";
+}
 // ------------------------ HRManager ------------------------
-HRManager::HRManager(string n) : HRRole(n, RoleType::HRManager) {}
-void HRManager::displayRole() { cout << name << " is an HR Manager.\n"; }
+
 
 void HRManager::createVacancy(string id, string title, string dept,
                               float HSC_Result, float SSC_Result, int exp, string cert) {
@@ -171,30 +178,6 @@ void HRManager::approveHire(JobVacancy &vacancy) {
     }
 
     cout << "All shortlisted applicants processed for vacancy: " << vacancy.jobTitle << endl;
-}
-
-// ------------------------ AttendanceOfficer ------------------------
-AttendanceOfficer::AttendanceOfficer(string n, AttendanceManagement& system)
-    : HRRole(n, RoleType::AttendanceOfficer), name(n), attendanceSystem(system) {}
-
-void AttendanceOfficer::displayRole() { cout << name << " is an Attendance Officer.\n"; }
-
-void AttendanceOfficer::verifyDocument(string docName) {
-    if (!canVerifyDocuments()) { 
-        cout << "Access Denied!\n"; 
-        return; 
-    }
-    cout << name << " verified document: " << docName << endl;
-}
-
-void AttendanceOfficer::GiveAttendance(const string& employeeId,
-                                       const string& date,
-                                       bool present) {
-    AttendanceStatus status = present ? AttendanceStatus::Present : AttendanceStatus::Absent;
-    attendanceSystem.addAttendance(employeeId, date, status);
-    cout << name << " marked attendance for "
-         << employeeId << " on " << date
-         << " as " << (present ? "Present" : "Absent") << endl;
 }
 
 // ------------------------ RecruitmentOfficer ------------------------
