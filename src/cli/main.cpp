@@ -1,6 +1,7 @@
 #include <iostream>
 #include "cli.h"
-#include "core/farm_os.h"
+#include "widgets.h"
+#include "core/models/transaction.h"
 
 int deletePerson(const Args& args)
 {
@@ -12,28 +13,25 @@ int deletePerson(const Args& args)
 
 int addPerson(const Args& args)
 {
-    std::string name;
-    loadArg(name, 0, "name");
+    // loadArg(name, 0, "name");
+    std::string name = wx::lineInput<std::string>("Enter name: ");
     std::cout << "Adding person " << name << "\n";
+
+    TransactionType tt = wx::selectInput<TransactionType>(
+        "Transaction type ? ",
+        tx::TransactionTypeStrs,4,
+        tx::stt
+    );
+    std::cout<<tx::toStr(tt);
     return 0;
 }
 
 void setupCli(CLI& cli) {
-    //cli.registerModule({
-    //    "person",
-    //    "Manage persons",
-    //    {
-    //        { "delete", { "Delete a person",  deletePerson }},
-    //        { "add", {"Add a person", addPerson}}
-    //    }
-    //});
-
-	REG_MOD(cli, person, "Manage persons") 
+	REG_MOD(cli, person, "Manage persons")
     {
 		ADD_CMD(add, "Add a person", addPerson);
 		ADD_CMD(delete, "Delete a person", deletePerson);
 	}
-
 }
 
 int main(int argc, char** argv) {
