@@ -107,4 +107,5 @@ namespace tx{
 		if(s == "OUT") return TransactionDirection::OUT;
 		throw std::runtime_error("Invalid transaction direction string: " + s);
 	}
+	TransactionDirection typeToDir(TransactionType t);
 }

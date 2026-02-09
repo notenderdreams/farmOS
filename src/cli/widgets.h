@@ -35,7 +35,6 @@ E selectInput(
     }
 
     std::string str;
-    // !BUG for now it runs infinitely if string is provied 
     while(true){
         std::cout
             << BLUE
