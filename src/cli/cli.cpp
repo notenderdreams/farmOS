@@ -1,26 +1,8 @@
 #include "cli.h"
+#include "color.h"
 #include <iostream>
 
-namespace
-{
-	// For Colored printing
-	constexpr const char* RESET = "\033[0m";
-	constexpr const char* BLUE = "\033[94m";
-	constexpr const char* GREEN = "\033[92m";
-	constexpr const char* GREY = "\033[2m";
-	constexpr const char* RED = "\033[91m";
-	constexpr const char* YELLOW = "\033[93m";
-
-	void printError(const std::string& message)
-	{
-		std::cerr << RED << "Error: " << RESET << message << "\n";
-	}
-
-	void printSeperator()
-	{
-		std::cout << GREY << "---------------------------------\n" << RESET;
-	}
-}
+using namespace asc;
 
 CLI::CLI(const std::string& app_name)
 	: _app_name(app_name) {

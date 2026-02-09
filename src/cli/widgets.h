@@ -1,11 +1,14 @@
 #pragma once 
+#include "color.h"
+
+using namespace asc;
 
 namespace wx{
 template<typename T>
 T lineInput(const std::string& prompt)
 {
     T value;
-    std::cout<< prompt;
+    std::cout<<GREEN<< prompt << RESET;
     std::cin >> value;
     std::cin.ignore();
     return value;
@@ -14,7 +17,7 @@ template<>
 std::string lineInput<std::string>(const std::string& prompt)
 {
     std::string value;
-    std::cout<< prompt;
+    std::cout<<GREEN<< prompt << RESET;
     std::getline(std::cin,value);
     return value;
 }
@@ -31,17 +34,25 @@ E selectInput(
         std::cout<<i<<". "<<options[i]<<std::endl;
     }
 
-    int choice;
+    std::string str;
     // !BUG for now it runs infinitely if string is provied 
     while(true){
-        std::cout<<"Enter your choice (1-"<<length<<"): ";
-        std::cin>>choice;
+        std::cout
+            << BLUE
+            <<"Enter your choice (1-"<<length<<"): "
+            << RESET;
+        std::cin>>str;
         std::cin.ignore();
+        try {
+            int choice = std::stoi(str);
 
-        if(choice >= 1 && choice <= length){
-            return convert(options[choice-1]);
-        }
-        std::cout<<"Invalid choice. Please try again."<<std::endl;
+            if(choice >= 1 && choice <= length){
+                return convert(options[choice-1]);
+            }
+        } 
+        catch (...) {}
+
+        printError("Invalid Choice. Try again.");
     }
 }
 }
