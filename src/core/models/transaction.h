@@ -44,7 +44,7 @@ struct Transaction
 
 	std::string description;
 	std::string date; // YYYY-MM-DD
-	TransactionStatus status = TransactionStatus::COMPLETED;
+	TransactionStatus status = TransactionStatus::PENDING;
 
 
 };

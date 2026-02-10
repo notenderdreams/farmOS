@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
         ADD_CMD(add, "Add a new transaction", txAdd);
         ADD_CMD(list, "List all transactions", txList);
         ADD_CMD(show, "Show transaction details", txShow);
-        ADD_CMD(update-status, "Update transaction status", txUpdateStatus);
+        ADD_CMD(status, "Update transaction status", txUpdateStatus);
     }
     
     return cli.run(argc, argv);

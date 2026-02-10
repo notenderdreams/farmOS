@@ -20,7 +20,7 @@ int txAdd(const Args& args) {
     Transaction tx;
     
     tx.type = wx::selectInput<TransactionType>(
-        "Transaction type:\n",
+        "Transaction type:",
         tx::TransactionTypeStrs, 4,
         tx::stt
     );
@@ -28,7 +28,7 @@ int txAdd(const Args& args) {
     tx.direction = tx::typeToDir(tx.type);
     tx.amount = wx::lineInput<double>("Amount: ");
     tx.entity_type = wx::selectInput<TransactionEntityType>(
-        "Entity type:\n",
+        "Entity type:",
         tx::TransactionEntityTypeStrs, 3,
         tx::ste
     );
@@ -102,8 +102,8 @@ int txShow(const Args& args) {
         std::cout << asc::BLUE << "Transaction #" << tx.tid << asc::RESET << "\n";
         asc::printSeperator();
         printTransaction(tx, false);
-        std::cout << "  Date: " << tx.date << "\n";
-        std::cout << "  Status: " << tx::toStr(tx.status) << "\n";
+        std::cout << "\tDate: " << tx.date << "\n";
+        std::cout << "\tStatus: " << tx::toStr(tx.status) << "\n";
         asc::printSeperator();
     } catch (const std::exception& e) {
         asc::printError(std::string("Failed to show transaction: ") + e.what());
@@ -115,25 +115,46 @@ int txShow(const Args& args) {
 int txUpdateStatus(const Args& args) {
     auto* app_state = getAppState(args);
     if (!app_state) return 1;
-    
+
     auto* tx_service = app_state->getTransactionService();
     if (!tx_service) {
         asc::printError("Failed to initialize transaction service");
         return 1;
     }
-    
+
     std::string tid_str;
     loadArg(tid_str, 0, "transaction_id");
     
     try {
         i64 tid = std::stoll(tid_str);
-        
+
+        Transaction tx = tx_service->getTransactionById(tid);
+        std::cout << "Current status for ID: "<<tid<<std::endl;
+        // TODO : can't access toStr so hardcoding 
+        switch (tx.status)
+        {
+        case TransactionStatus::PENDING :
+            std::cout << asc::YELLOW << "PENDING";
+            break;
+        case TransactionStatus::CANCELLED :
+            std::cout << asc::RED << "CANCELLED";
+            break;
+        case TransactionStatus::COMPLETED :
+            std::cout << asc::GREEN << "COMPLETED";
+            break;
+        }
+        std::cout<< asc::RESET << "\n";
+
+        if (tx.status != TransactionStatus::PENDING) {
+            return 0;
+        }
+
         TransactionStatus new_status = wx::selectInput<TransactionStatus>(
-            "New status: ",
+            "Modify status:",
             tx::TransactionStatusStrs, 3,
             tx::sts
         );
-        
+
         tx_service->updateStatus(tid, new_status);
         std::cout << asc::GREEN << "✓ Transaction status updated" << asc::RESET << "\n";
     } catch (const std::exception& e) {
