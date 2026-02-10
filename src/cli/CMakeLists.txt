@@ -1,11 +1,9 @@
-add_executable(cli
-    main.cpp
+add_library(farmOS_cli STATIC
     cli.cpp
     color.cpp
-    app_state.cpp
 )
 
-target_link_libraries(cli
-    PRIVATE
-        farmOS_core
+target_include_directories(farmOS_cli
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )

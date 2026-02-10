@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cli.h"
+#include "cli/cli.h"
 #include "core/transaction_service.h"
 #include <string>
 

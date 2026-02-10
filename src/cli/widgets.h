@@ -1,5 +1,6 @@
 #pragma once 
 #include "color.h"
+#include <iostream>
 
 using namespace asc;
 

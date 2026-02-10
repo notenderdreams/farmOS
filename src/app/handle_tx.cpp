@@ -1,8 +1,8 @@
-#pragma once 
-#include "widgets.h"
+#include "handle_tx.h"
+#include "cli/widgets.h"
 #include "core/models/transaction.h"
 #include "core/transaction_service.h"
-#include "cli.h"
+#include "cli/cli.h"
 #include "app_state.h"
 #include "utils.h"
 #include <iostream>

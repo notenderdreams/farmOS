@@ -1,5 +1,5 @@
 #include "app_state.h"
-#include "color.h"
+#include "cli/color.h"
 #include <iostream>
 
 AppState::AppState(const std::string& db_path) 
