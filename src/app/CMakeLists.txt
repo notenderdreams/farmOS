@@ -1,5 +1,5 @@
 add_executable(farmos
-    main.cpp
+    farmos.cpp
     app_state.cpp
     handle_tx.cpp
 )
