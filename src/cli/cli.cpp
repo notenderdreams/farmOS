@@ -10,13 +10,13 @@ CLI::CLI(const std::string& app_name)
 
 void CLI::registerModule(const ModuleDef& module)
 {
-	modules_[module.name] = module;
+	_modules[module.name] = module;
 }
 
 const ModuleDef* CLI::findModule(const std::string& name) const
 {
-	auto it = modules_.find(name);
-	if (it == modules_.end())
+	auto it = _modules.find(name);
+	if (it == _modules.end())
 		return nullptr;
 	return &it->second;
 }
@@ -84,6 +84,7 @@ int CLI::run(int argc, char** argv)
 	}
 
 	Args args;
+	args.cli = this;
 	for (int i = 3; i < argc; ++i) {
 		args.positional.push_back(argv[i]);
 	}
@@ -96,7 +97,7 @@ void CLI::showHelp() const
 	std::cout << _app_name << "\n";
 	std::cout << "Usage: " << _app_name << " <module> <command> [args...]\n";
 	std::cout << "Modules:\n";
-	for (const auto& mod : modules_) {
+	for (const auto& mod : _modules) {
 		showModuleHelp(mod.second);
 	}
 }

@@ -2,6 +2,7 @@ add_executable(cli
     main.cpp
     cli.cpp
     color.cpp
+    app_state.cpp
 )
 
 target_link_libraries(cli

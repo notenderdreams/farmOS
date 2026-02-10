@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#include <typeindex>
+
 
 // ## ARG MACROS
 #define getArg(pos) \
@@ -24,10 +26,12 @@
 #define ADD_CMD(name, desc, fn) \
     __module.cmd(#name, desc, fn)
 
+class CLI;
 
 struct Args
 {
     std::vector<std::string> positional;
+    CLI* cli = nullptr;  
 };
 
 struct CommandDef
@@ -43,12 +47,36 @@ struct ModuleDef
     std::unordered_map<std::string, CommandDef> commands;
 };
 
+class StateComponent{
+public:
+    virtual ~StateComponent() = default;
+};
+
 class CLI
 {
 public:
     explicit CLI(const std::string& app_name);
 
     void registerModule(const ModuleDef& module);
+    
+    template<typename T>
+    void registerState(T* component) {
+        _state_components[typeid(T)] = component;
+    }
+
+    template<typename T>
+    T* getState() const {
+        auto it = _state_components.find(typeid(T));
+        if (it == _state_components.end())
+            return nullptr;
+        return static_cast<T*>(it->second);
+    }
+
+    template<typename T>
+    bool hasState() const {
+        return _state_components.find(typeid(T)) != _state_components.end();
+    }
+
     int run(int argc, char** argv);
 
 private:
@@ -57,8 +85,10 @@ private:
                                   const std::string& name) const ;
     void showHelp() const;
     void showModuleHelp(const ModuleDef& module) const;    
+
     std::string _app_name;
-    std::unordered_map<std::string, ModuleDef> modules_;
+    std::unordered_map<std::string, ModuleDef> _modules;
+    std::unordered_map<std::type_index, StateComponent*> _state_components;
 };
 
 class ModuleBuilder
