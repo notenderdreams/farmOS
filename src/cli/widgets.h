@@ -29,9 +29,9 @@ E selectInput(
     int length,
     E(*convert)(const std::string&)
 ){
-    std::cout<< prompt;
-    for(int i=1;i<=length;++i){
-        std::cout<<i<<". "<<options[i]<<std::endl;
+    std::cout<< prompt <<std::endl;
+    for(int i=0;i<length;++i){
+        std::cout<<i + 1<<". "<<options[i]<<std::endl;
     }
 
     std::string str;
