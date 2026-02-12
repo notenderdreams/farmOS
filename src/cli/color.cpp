@@ -1,7 +1,7 @@
 #include "color.h"
 #include <iostream>
 
-namespace asc
+namespace color
 {
     const char* RESET  = "\033[0m";
     const char* BLUE   = "\033[94m";

@@ -31,22 +31,24 @@ E selectInput(prompt, options[], length, converterFunction)
 2. A function that converts a string to your enum
 
 ```cpp
-// Already defined in transaction.h
-enum class TransactionType { BUY, SELL, SALARY, BILLS };
-const char* TransactionTypeStrs[] = {"BUY", "SELL", "SALARY", "BILLS"};
+    enum class TType { BUY, SELL };
+    char* array_of_strings[] = {"BUY", "SELL"};
+    int len = 2;
 
-TransactionType stt(const std::string& s) {
-    if (s == "BUY")    return TransactionType::BUY;
-    if (s == "SELL")   return TransactionType::SELL;
-    if (s == "SALARY") return TransactionType::SALARY;
-    if (s == "BILLS")  return TransactionType::BILLS;
-    throw std::runtime_error("Invalid type: " + s);
-}
+    TType converter (string& s) {
+        if (s == "BUY")    return TType::BUY;
+        if (s == "SELL")   return TType::SELL;
+        throw std::runtime_error("Invalid type: " + s);
+    }
 
-// Usage
-TransactionType t = wx::selectInput<TransactionType>(
-    "Transaction type:", tx::TransactionTypeStrs, 4, tx::stt
-);
+    string prompt = "Transaction Type:";
+
+    E t = wx::selectInput<TType>(
+        prompt,
+        array_of_strings,
+        len,
+        converter
+    );
 ```
 
 User sees:
@@ -54,7 +56,5 @@ User sees:
 Transaction type:
 1. BUY
 2. SELL
-3. SALARY
-4. BILLS
-Enter your choice (1-4): 
+Enter your choice (1-2): 
 ```

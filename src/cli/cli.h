@@ -1,3 +1,9 @@
+/*
+ * This header file containes the implementation of 
+ * the cli system which attempt to abstract the 
+ * argument parsing . 
+ */
+
 #pragma once
 
 #include <string>
@@ -18,13 +24,8 @@
     } else { \
         var = getArg(pos); \
     }
-
-// ## BUILD / REG MACROS
-#define REG_MOD(cli,name,desc) \
-    if (ModuleBuilder __module(cli, #name, desc); true)
-
-#define ADD_CMD(name, desc, fn) \
-    __module.cmd(#name, desc, fn)
+    
+    
 
 class CLI;
 
@@ -90,6 +91,25 @@ private:
     std::unordered_map<std::string, ModuleDef> _modules;
     std::unordered_map<std::type_index, StateComponent*> _state_components;
 };
+
+
+
+/*
+ * This class simplifies the Module and command 
+ * registration. REGMOD creates a ModuleBuilder 
+ * object in a temp scope using if .
+ * In that scope ADD_CMD registers those commands to 
+ * the new module. When the scope ends destructor of
+ * ModuleBuilder is called which registers the module 
+ * along with it's commands to the cli. 
+ */
+ 
+ // ## BUILD / REG MACROS
+ #define REG_MOD(cli,name,desc) \
+     if (ModuleBuilder __module(cli, #name, desc); true)
+ 
+ #define ADD_CMD(name, desc, fn) \
+     __module.cmd(#name, desc, fn)
 
 class ModuleBuilder
 {

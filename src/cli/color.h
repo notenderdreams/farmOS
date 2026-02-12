@@ -1,8 +1,16 @@
+/*
+ *   This header file contains necessary ascii
+ *   sequences for colored printing and some
+ *   printing utilities.
+ */
+
+
 #pragma once
 #include <string>
 
-namespace asc
+namespace color
 {
+    // Usage:     std::cout << BLUE << "FarmOS" << RESET;
     extern const char* RESET;
     extern const char* BLUE;
     extern const char* GREEN;

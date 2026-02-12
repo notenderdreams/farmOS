@@ -2,7 +2,7 @@
 #include "color.h"
 #include <iostream>
 
-using namespace asc;
+using namespace color;
 
 CLI::CLI(const std::string& app_name)
 	: _app_name(app_name) {

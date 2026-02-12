@@ -15,7 +15,7 @@ std::string getCurrentDate(){
 }
 
 inline void printTransaction(const Transaction& tx, bool show_separator = true) {
-    std::cout << asc::GREEN << "ID: " << asc::RESET << tx.tid << "\n";
+    std::cout << color::GREEN << "ID: " << color::RESET << tx.tid << "\n";
     std::cout << "\tType: " << tx::toStr(tx.type) << "\n";
     std::cout << "\tDirection: " << tx::toStr(tx.direction) << "\n";
     std::cout << "\tAmount: $" << tx.amount << "\n";
@@ -25,6 +25,6 @@ inline void printTransaction(const Transaction& tx, bool show_separator = true) 
     std::cout << "\tStatus: " << tx::toStr(tx.status) << "\n";
     
     if (show_separator) {
-        asc::printSeperator();
+        color::printSeperator();
     }
 }

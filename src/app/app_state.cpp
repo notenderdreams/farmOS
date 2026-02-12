@@ -23,20 +23,20 @@ void AppState::ensureDatabase() {
             _tx_service = new TransactionService(_db_path);
             _tx_service->initTable();
         } catch (const std::exception& e) {
-            asc::printError(std::string("Failed to initialize database: ") + e.what());
+            color::printError(std::string("Failed to initialize database: ") + e.what());
         }
     }
 }
 
 AppState* getAppState(const Args& args) {
     if (!args.cli) {
-        asc::printError("CLI context not available");
+        color::printError("CLI context not available");
         return nullptr;
     }
     
     auto* state = args.cli->getState<AppState>();
     if (!state) {
-        asc::printError("AppState not registered");
+        color::printError("AppState not registered");
         return nullptr;
     }
     return state;

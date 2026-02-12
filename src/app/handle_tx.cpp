@@ -13,7 +13,7 @@ int txAdd(const Args& args) {
     
     auto* tx_service = app_state->getTransactionService();
     if (!tx_service) {
-        asc::printError("Failed to initialize transaction service");
+        color::printError("Failed to initialize transaction service");
         return 1;
     }
     
@@ -37,13 +37,13 @@ int txAdd(const Args& args) {
     tx.description = wx::lineInput<std::string>("Description: ");
     
     tx.date = getCurrentDate();
-    std::cout << asc::GREY << "Date set to: " << tx.date << asc::RESET << "\n";
+    std::cout << color::GREY << "Date set to: " << tx.date << color::RESET << "\n";
     
     try {
         tx_service->addTransaction(tx);
-        std::cout << asc::GREEN << "✓ Transaction added successfully" << asc::RESET << "\n";
+        std::cout << color::GREEN << "✓ Transaction added successfully" << color::RESET << "\n";
     } catch (const std::exception& e) {
-        asc::printError(std::string("Failed to add transaction: ") + e.what());
+        color::printError(std::string("Failed to add transaction: ") + e.what());
         return 1;
     }
 
@@ -56,7 +56,7 @@ int txList(const Args& args) {
     
     auto* tx_service = app_state->getTransactionService();
     if (!tx_service) {
-        asc::printError("Failed to initialize transaction service");
+        color::printError("Failed to initialize transaction service");
         return 1;
     }
     
@@ -64,18 +64,18 @@ int txList(const Args& args) {
         auto transactions = tx_service->getAllTransactions();
         
         if (transactions.empty()) {
-            std::cout << asc::YELLOW << "No transactions found" << asc::RESET << "\n";
+            std::cout << color::YELLOW << "No transactions found" << color::RESET << "\n";
             return 0;
         }
         
-        std::cout << asc::BLUE << "Transactions:" << asc::RESET << "\n";
-        asc::printSeperator();
+        std::cout << color::BLUE << "Transactions:" << color::RESET << "\n";
+        color::printSeperator();
         
         for (const auto& tx : transactions) {
             printTransaction(tx);
         }
     } catch (const std::exception& e) {
-        asc::printError(std::string("Failed to list transactions: ") + e.what());
+        color::printError(std::string("Failed to list transactions: ") + e.what());
         return 1;
     }
     
@@ -88,7 +88,7 @@ int txShow(const Args& args) {
     
     auto* tx_service = app_state->getTransactionService();
     if (!tx_service) {
-        asc::printError("Failed to initialize transaction service");
+        color::printError("Failed to initialize transaction service");
         return 1;
     }
     
@@ -99,14 +99,14 @@ int txShow(const Args& args) {
         i64 tid = std::stoll(tid_str);
         auto tx = tx_service->getTransactionById(tid);
         
-        std::cout << asc::BLUE << "Transaction #" << tx.tid << asc::RESET << "\n";
-        asc::printSeperator();
+        std::cout << color::BLUE << "Transaction #" << tx.tid << color::RESET << "\n";
+        color::printSeperator();
         printTransaction(tx, false);
         std::cout << "\tDate: " << tx.date << "\n";
         std::cout << "\tStatus: " << tx::toStr(tx.status) << "\n";
-        asc::printSeperator();
+        color::printSeperator();
     } catch (const std::exception& e) {
-        asc::printError(std::string("Failed to show transaction: ") + e.what());
+        color::printError(std::string("Failed to show transaction: ") + e.what());
         return 1;
     }
     return 0;
@@ -118,7 +118,7 @@ int txUpdateStatus(const Args& args) {
 
     auto* tx_service = app_state->getTransactionService();
     if (!tx_service) {
-        asc::printError("Failed to initialize transaction service");
+        color::printError("Failed to initialize transaction service");
         return 1;
     }
 
@@ -134,16 +134,16 @@ int txUpdateStatus(const Args& args) {
         switch (tx.status)
         {
         case TransactionStatus::PENDING :
-            std::cout << asc::YELLOW << "PENDING";
+            std::cout << color::YELLOW << "PENDING";
             break;
         case TransactionStatus::CANCELLED :
-            std::cout << asc::RED << "CANCELLED";
+            std::cout << color::RED << "CANCELLED";
             break;
         case TransactionStatus::COMPLETED :
-            std::cout << asc::GREEN << "COMPLETED";
+            std::cout << color::GREEN << "COMPLETED";
             break;
         }
-        std::cout<< asc::RESET << "\n";
+        std::cout<< color::RESET << "\n";
 
         if (tx.status != TransactionStatus::PENDING) {
             return 0;
@@ -156,9 +156,9 @@ int txUpdateStatus(const Args& args) {
         );
 
         tx_service->updateStatus(tid, new_status);
-        std::cout << asc::GREEN << "✓ Transaction status updated" << asc::RESET << "\n";
+        std::cout << color::GREEN << "✓ Transaction status updated" << color::RESET << "\n";
     } catch (const std::exception& e) {
-        asc::printError(std::string("Failed to update transaction: ") + e.what());
+        color::printError(std::string("Failed to update transaction: ") + e.what());
         return 1;
     }
     
