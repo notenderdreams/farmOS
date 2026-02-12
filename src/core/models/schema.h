@@ -18,5 +18,19 @@ inline constexpr const std::string_view TRANSACTIONS_TABLE = R"(
     );
 )";
 
+inline constexpr const std::string_view INVENTORY_TABLE = R"(
+    CREATE TABLE IF NOT EXISTS inventory (
+        item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        category TEXT NOT NULL,
+        quantity REAL NOT NULL DEFAULT 0,
+        unit TEXT NOT NULL,
+        reorder_level REAL DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+)";
+
+
 } // namespace farmos::models
 
