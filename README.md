@@ -27,6 +27,16 @@ farmos/
 - C++17-compatible compiler
 
 
+### Using Make (Recommended)
+```bash
+make build   # configure and build
+make run     # build and run
+make test    # build and run tests
+make clean   # remove build directory
+```
+
+### Manual
+
 ```bash
 mkdir  build
 cmake -S . -B build
@@ -35,7 +45,7 @@ cmake --build build
 Binary output : `build/src/app/farmos.exe`
 
 
-## Running Tests
+####  Running Tests
 ```
 ctest
 ```
