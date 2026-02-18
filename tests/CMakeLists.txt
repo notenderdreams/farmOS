@@ -8,7 +8,8 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(farmOS_tests
-    test_db.cpp
+    test_transaction_service.cpp
+    test_inventory_service.cpp
 )
 
 target_link_libraries(farmOS_tests
