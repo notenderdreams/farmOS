@@ -10,21 +10,23 @@ namespace {
 		std::string current;
 		bool in_quotes = false;
 		bool escaping = false;
-
 		for (char ch : line) {
 			if (escaping) {
 				current.push_back(ch);
 				escaping = false;
 				continue;
 			}
-			if (ch == '\\') {
+
+			if (ch == '\\' && in_quotes) {
 				escaping = true;
 				continue;
 			}
+
 			if (ch == '"') {
 				in_quotes = !in_quotes;
 				continue;
 			}
+
 			if (!in_quotes && std::isspace(static_cast<unsigned char>(ch))) {
 				if (!current.empty()) {
 					tokens.push_back(current);
@@ -32,6 +34,7 @@ namespace {
 				}
 				continue;
 			}
+
 			current.push_back(ch);
 		}
 
@@ -113,6 +116,7 @@ int CLI::runCommand(const std::vector<std::string>& tokens)
 		printError("Both module and command must be specified.");
 		std::cout << "Usage: " << getAppName() << " <module> <command> [args...]\n";
 		std::cout << "Use '" << getAppName() << " help' to see available modules.\n";
+		std::cout << "Use \\q to leave the REPL.\n";
 		return 1;
 	}
 
@@ -161,7 +165,11 @@ void CLI::startRepl()
 		if (tokens.empty()) {
 			continue;
 		}
-		if (tokens[0] == "exit" || tokens[0] == "quit") {
+		if (
+			tokens[0] == "exit" || 
+			tokens[0] == "quit" ||
+			tokens[0] == "\\q"
+		) {
 			break;
 		}
 		runCommand(tokens);
