@@ -1,5 +1,5 @@
 BUILD_DIR := build
-BINARY := $(BUILD_DIR)/src/app/farmos
+BINARY := $(BUILD_DIR)/src/app/Debug/farmos
 
 .PHONY: build test run clean
 

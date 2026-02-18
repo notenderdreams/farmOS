@@ -8,7 +8,8 @@
   by <b>2L8 Sessions</b>
 </p>
 
-## Project Structure 
+## Project Structure
+
 ```
 farmos/
 ├── Docs/        # CLI documentation
@@ -20,17 +21,18 @@ farmos/
 └── tests/       # Tests
 ```
 
+## Build
 
-## Build 
-### Requirements : 
+### Requirements :
+
 - CMake 3.15+
 - C++17-compatible compiler
 
-
 ### Using Make (Recommended)
+
 ```bash
 make build   # configure and build
-make run     # build and run
+make run     # build and run (Debug)
 make test    # build and run tests
 make clean   # remove build directory
 ```
@@ -40,16 +42,19 @@ make clean   # remove build directory
 ```bash
 mkdir  build
 cmake -S . -B build
-cmake --build build 
+cmake --build build
 ```
+
 Binary output : `build/src/app/farmos.exe`
 
+#### Running Tests
 
-####  Running Tests
 ```
 ctest
 ```
-  Ensure the project is built before running tests.
+
+Ensure the project is built before running tests.
 
 ## Documentation
+
 - [CLI Documentation](Docs/cli/Readme.md) — How to attach your logic to the app
