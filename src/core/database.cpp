@@ -1,21 +1,25 @@
 #include "core/database.h"
 #include <stdexcept>
 
-Database::Database(const std::string& path) : db(nullptr)
-{
-    if (sqlite3_open(path.c_str(), &db) != SQLITE_OK) {
-        throw std::runtime_error(
-            "Failed to open database: " + 
-            std::string(sqlite3_errmsg(db))
-        );
-    }
-}
+Database::Database(const std::string& path) : db(getConn(path)) {}
 
 Database::Database(sqlite3* db) : db(db) {}
 
 Database::~Database()
 {
     if (db) sqlite3_close(db);
+}
+
+sqlite3* Database::getConn(const std::string& path)
+{
+    sqlite3* conn = nullptr;
+    if (sqlite3_open(path.c_str(), &conn) != SQLITE_OK) {
+        throw std::runtime_error(
+            "Failed to open database: " + 
+            std::string(sqlite3_errmsg(conn))
+        );
+    }
+    return conn;
 }
 
 bool Database::execute(const std::string& sql)

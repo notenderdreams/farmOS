@@ -10,6 +10,8 @@ public:
     Database(sqlite3* db);
     virtual ~Database();
 
+    static sqlite3* getConn(const std::string& path);
+
     bool execute(const std::string& sql);
     sqlite3_stmt* prepare(const std::string& sql);
 
