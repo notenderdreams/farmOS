@@ -61,12 +61,14 @@ public:
     void registerModule(const ModuleDef& module);
     
     template<typename T>
-    void registerState(T* component) {
+    void registerState(T* component) 
+    {
         _state_components[typeid(T)] = component;
     }
 
     template<typename T>
-    T* getState() const {
+    T* getState() const 
+    {
         auto it = _state_components.find(typeid(T));
         if (it == _state_components.end())
             return nullptr;
@@ -74,16 +76,25 @@ public:
     }
 
     template<typename T>
-    bool hasState() const {
+    bool hasState() const 
+    {
         return _state_components.find(typeid(T)) != _state_components.end();
     }
 
     int run(int argc, char** argv);
 
+    std::string getAppName() const { return _app_name; }
+
 private:
+    int runCommand(const std::vector<std::string>& tokens);
+    void startRepl();
     const ModuleDef* findModule(const std::string& name) const ;
-    const CommandDef* findCommand(const ModuleDef& module,
-                                  const std::string& name) const ;
+    
+    const CommandDef* findCommand(
+        const ModuleDef& module,
+        const std::string& name
+    ) const ;
+    
     void showHelp() const;
     void showModuleHelp(const ModuleDef& module) const;    
 
