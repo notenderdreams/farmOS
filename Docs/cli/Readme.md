@@ -1,4 +1,4 @@
-# Better Call CLI
+# MOROL CLI Framework
 
 **File:** `src/cli/cli.h`
 
