@@ -11,6 +11,9 @@
 #include <iostream>
 
 
+static std::string strToGender(const std::string& s) { return s; }
+
+
 static void printAnimal(const AnimalRecord& r, bool show_separator = true)
 {
     std::cout << color::GREEN << "ID: " << color::RESET << r.animal_id << "\n";
@@ -56,7 +59,7 @@ int animalBuy(const Args& args)
     r.gender = wx::selectInput<std::string>(
         "Gender:",
         genderOpts, 2,
-        [](const std::string& s) -> std::string { return s; }
+        strToGender
     );
 
     r.purpose = wx::selectInput<AnimalPurpose>(
@@ -68,19 +71,18 @@ int animalBuy(const Args& args)
     r.age    = wx::lineInput<int>   ("Age (years): ");
     r.weight = wx::lineInput<double>("Weight (kg): ");
 
-    double price = wx::lineInput<double>("Purchase price: $");
-
+    double price            = wx::lineInput<double>     ("Purchase price: $");
     std::string description = wx::lineInput<std::string>("Description: ");
 
     try {
         animal_service->addAnimal(r);
 
-        auto all = animal_service->getAllAnimals();
+        auto all   = animal_service->getAllAnimals();
         i64 new_id = all.back().animal_id;
 
         Transaction tx;
         tx.type        = TransactionType::BUY;
-        tx.direction   = tx::typeToDir(TransactionType::BUY); // OUT
+        tx.direction   = tx::typeToDir(TransactionType::BUY);
         tx.amount      = price;
         tx.entity_type = TransactionEntityType::ANIMAL;
         tx.entity_id   = std::to_string(new_id);
@@ -128,14 +130,14 @@ int animalSell(const Args& args)
             return 1;
         }
 
-        double price = wx::lineInput<double>("Sale price: $");
+        double price            = wx::lineInput<double>     ("Sale price: $");
         std::string description = wx::lineInput<std::string>("Description: ");
 
         animal_service->updateStatus(aid, AnimalStatus::PROCESSED);
 
         Transaction tx;
         tx.type        = TransactionType::SELL;
-        tx.direction   = tx::typeToDir(TransactionType::SELL); 
+        tx.direction   = tx::typeToDir(TransactionType::SELL);
         tx.amount      = price;
         tx.entity_type = TransactionEntityType::ANIMAL;
         tx.entity_id   = std::to_string(aid);

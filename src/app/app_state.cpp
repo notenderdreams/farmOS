@@ -13,7 +13,6 @@ AppState::~AppState() {
     delete _animal_service;
 }
 
-// ── TransactionService ────────────────────────────────────────────────────────
 
 TransactionService* AppState::getTransactionService() {
     ensureTransactionService();
@@ -31,7 +30,6 @@ void AppState::ensureTransactionService() {
     }
 }
 
-// ── AnimalService ─────────────────────────────────────────────────────────────
 
 AnimalService* AppState::getAnimalService() {
     ensureAnimalService();
@@ -49,7 +47,6 @@ void AppState::ensureAnimalService() {
     }
 }
 
-// ── Helper ────────────────────────────────────────────────────────────────────
 
 AppState* getAppState(const Args& args) {
     if (!args.cli) {
