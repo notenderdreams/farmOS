@@ -4,6 +4,7 @@ add_library(farmOS_core STATIC
     database.cpp
     models/transaction.cpp
     models/inventory.cpp
+    models/animal.cpp
 )
 
 target_include_directories(farmOS_core

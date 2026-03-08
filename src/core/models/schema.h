@@ -31,6 +31,23 @@ inline constexpr const std::string_view INVENTORY_TABLE = R"(
     );
 )";
 
+inline constexpr const std::string_view ANIMALS_TABLE = R"(
+    CREATE TABLE IF NOT EXISTS animals (
+        animal_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type      TEXT NOT NULL,
+        breed     TEXT NOT NULL,
+        gender    TEXT NOT NULL,
+        purpose   TEXT NOT NULL,
+        status    TEXT NOT NULL DEFAULT 'ALIVE',
+        age       INTEGER NOT NULL DEFAULT 0,
+        weight    REAL NOT NULL DEFAULT 0,
+        milk      INTEGER NOT NULL DEFAULT 0,
+        eggs      INTEGER NOT NULL DEFAULT 0,
+        meat      INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+)";
+
 
 } // namespace farmos::models
 
