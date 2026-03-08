@@ -2,38 +2,61 @@
 #include "cli/color.h"
 #include <iostream>
 
-AppState::AppState(const std::string& db_path) 
-    : _db_path(db_path), _tx_service(nullptr) {
+AppState::AppState(const std::string& db_path)
+    : _db_path(db_path),
+      _tx_service(nullptr),
+      _animal_service(nullptr) {
 }
 
 AppState::~AppState() {
-    if (_tx_service) {
-        delete _tx_service;
-    }
+    delete _tx_service;
+    delete _animal_service;
 }
 
+// ── TransactionService ────────────────────────────────────────────────────────
+
 TransactionService* AppState::getTransactionService() {
-    ensureDatabase();
+    ensureTransactionService();
     return _tx_service;
 }
 
-void AppState::ensureDatabase() {
+void AppState::ensureTransactionService() {
     if (!_tx_service) {
         try {
             _tx_service = new TransactionService(_db_path);
             _tx_service->initTable();
         } catch (const std::exception& e) {
-            color::printError(std::string("Failed to initialize database: ") + e.what());
+            color::printError(std::string("Failed to initialize transaction service: ") + e.what());
         }
     }
 }
+
+// ── AnimalService ─────────────────────────────────────────────────────────────
+
+AnimalService* AppState::getAnimalService() {
+    ensureAnimalService();
+    return _animal_service;
+}
+
+void AppState::ensureAnimalService() {
+    if (!_animal_service) {
+        try {
+            _animal_service = new AnimalService(_db_path);
+            _animal_service->initTable();
+        } catch (const std::exception& e) {
+            color::printError(std::string("Failed to initialize animal service: ") + e.what());
+        }
+    }
+}
+
+// ── Helper ────────────────────────────────────────────────────────────────────
 
 AppState* getAppState(const Args& args) {
     if (!args.cli) {
         color::printError("CLI context not available");
         return nullptr;
     }
-    
+
     auto* state = args.cli->getState<AppState>();
     if (!state) {
         color::printError("AppState not registered");
@@ -41,5 +64,3 @@ AppState* getAppState(const Args& args) {
     }
     return state;
 }
-
-
