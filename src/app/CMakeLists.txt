@@ -2,6 +2,7 @@ add_executable(farmos
     farmos.cpp
     app_state.cpp
     handle_tx.cpp
+    handle_animal.cpp
 )
 
 target_include_directories(farmos
