@@ -2,12 +2,14 @@
 #include "cli/widgets.h"
 #include "cli/color.h"
 #include "core/models/animal.h"
+#include "core/models/transaction.h"
 #include "core/animal_service.h"
+#include "core/transaction_service.h"
 #include "cli/cli.h"
 #include "app_state.h"
+#include "utils.h"
 #include <iostream>
 
-// ── Print helper ──────────────────────────────────────────────────────────────
 
 static void printAnimal(const AnimalRecord& r, bool show_separator = true)
 {
@@ -27,16 +29,16 @@ static void printAnimal(const AnimalRecord& r, bool show_separator = true)
         color::printSeperator();
 }
 
-// ── Commands ──────────────────────────────────────────────────────────────────
 
-int animalAdd(const Args& args)
+int animalBuy(const Args& args)
 {
     auto* app_state = getAppState(args);
     if (!app_state) return 1;
 
     auto* animal_service = app_state->getAnimalService();
-    if (!animal_service) {
-        color::printError("Failed to initialize animal service");
+    auto* tx_service     = app_state->getTransactionService();
+    if (!animal_service || !tx_service) {
+        color::printError("Failed to initialize services");
         return 1;
     }
 
@@ -48,16 +50,12 @@ int animalAdd(const Args& args)
         anim::strToType
     );
 
-    r.breed  = wx::lineInput<std::string>("Breed: ");
+    r.breed = wx::lineInput<std::string>("Breed: ");
+
+    static const char* genderOpts[] = { "male", "female" };
     r.gender = wx::selectInput<std::string>(
         "Gender:",
-        // inline const char* array via a lambda-free workaround
-        // wx::selectInput needs const char*[] so we use a small static
-        [&]() -> const char** {
-            static const char* g[] = { "male", "female" };
-            return g;
-        }(),
-        2,
+        genderOpts, 2,
         [](const std::string& s) -> std::string { return s; }
     );
 
@@ -70,16 +68,95 @@ int animalAdd(const Args& args)
     r.age    = wx::lineInput<int>   ("Age (years): ");
     r.weight = wx::lineInput<double>("Weight (kg): ");
 
+    double price = wx::lineInput<double>("Purchase price: $");
+
+    std::string description = wx::lineInput<std::string>("Description: ");
+
     try {
         animal_service->addAnimal(r);
-        std::cout << color::GREEN << "✓ Animal added successfully" << color::RESET << "\n";
+
+        auto all = animal_service->getAllAnimals();
+        i64 new_id = all.back().animal_id;
+
+        Transaction tx;
+        tx.type        = TransactionType::BUY;
+        tx.direction   = tx::typeToDir(TransactionType::BUY); // OUT
+        tx.amount      = price;
+        tx.entity_type = TransactionEntityType::ANIMAL;
+        tx.entity_id   = std::to_string(new_id);
+        tx.description = description;
+        tx.date        = getCurrentDate();
+        tx.status      = TransactionStatus::COMPLETED;
+
+        tx_service->addTransaction(tx);
+
+        std::cout << color::GREEN
+                  << "✓ Animal purchased and transaction recorded"
+                  << color::RESET << "\n";
+
     } catch (const std::exception& e) {
-        color::printError(std::string("Failed to add animal: ") + e.what());
+        color::printError(std::string("Failed to buy animal: ") + e.what());
         return 1;
     }
 
     return 0;
 }
+
+
+int animalSell(const Args& args)
+{
+    auto* app_state = getAppState(args);
+    if (!app_state) return 1;
+
+    auto* animal_service = app_state->getAnimalService();
+    auto* tx_service     = app_state->getTransactionService();
+    if (!animal_service || !tx_service) {
+        color::printError("Failed to initialize services");
+        return 1;
+    }
+
+    std::string id_str;
+    loadArg(id_str, 0, "animal_id");
+
+    try {
+        i64 aid = std::stoll(id_str);
+
+        AnimalRecord r = animal_service->getAnimalById(aid);
+
+        if (r.status != AnimalStatus::ALIVE) {
+            color::printError("Only ALIVE animals can be sold");
+            return 1;
+        }
+
+        double price = wx::lineInput<double>("Sale price: $");
+        std::string description = wx::lineInput<std::string>("Description: ");
+
+        animal_service->updateStatus(aid, AnimalStatus::PROCESSED);
+
+        Transaction tx;
+        tx.type        = TransactionType::SELL;
+        tx.direction   = tx::typeToDir(TransactionType::SELL); 
+        tx.amount      = price;
+        tx.entity_type = TransactionEntityType::ANIMAL;
+        tx.entity_id   = std::to_string(aid);
+        tx.description = description;
+        tx.date        = getCurrentDate();
+        tx.status      = TransactionStatus::COMPLETED;
+
+        tx_service->addTransaction(tx);
+
+        std::cout << color::GREEN
+                  << "✓ Animal sold and transaction recorded"
+                  << color::RESET << "\n";
+
+    } catch (const std::exception& e) {
+        color::printError(std::string("Failed to sell animal: ") + e.what());
+        return 1;
+    }
+
+    return 0;
+}
+
 
 int animalList(const Args& args)
 {
@@ -114,6 +191,7 @@ int animalList(const Args& args)
     return 0;
 }
 
+
 int animalShow(const Args& args)
 {
     auto* app_state = getAppState(args);
@@ -146,6 +224,7 @@ int animalShow(const Args& args)
     return 0;
 }
 
+
 int animalUpdateStatus(const Args& args)
 {
     auto* app_state = getAppState(args);
@@ -175,7 +254,6 @@ int animalUpdateStatus(const Args& args)
         }
         std::cout << color::RESET << "\n";
 
-        // Only ALIVE animals can have their status changed
         if (r.status != AnimalStatus::ALIVE) {
             std::cout << color::YELLOW
                       << "Only ALIVE animals can be updated."
@@ -199,6 +277,7 @@ int animalUpdateStatus(const Args& args)
 
     return 0;
 }
+
 
 int animalDelete(const Args& args)
 {

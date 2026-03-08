@@ -10,18 +10,19 @@ int main(int argc, char** argv) {
     cli.registerState(new AppState("../../farm.db"));
 
     REG_MOD(cli, tx, "Transaction management") {
-        ADD_CMD(add,    "Add a new transaction",      txAdd);
-        ADD_CMD(list,   "List all transactions",      txList);
-        ADD_CMD(show,   "Show transaction details",   txShow);
-        ADD_CMD(status, "Update transaction status",  txUpdateStatus);
+        ADD_CMD(add,    "Add a new transaction",     txAdd);
+        ADD_CMD(list,   "List all transactions",     txList);
+        ADD_CMD(show,   "Show transaction details",  txShow);
+        ADD_CMD(status, "Update transaction status", txUpdateStatus);
     }
 
     REG_MOD(cli, animal, "Animal management") {
-        ADD_CMD(add,    "Add a new animal",           animalAdd);
-        ADD_CMD(list,   "List all animals",           animalList);
-        ADD_CMD(show,   "Show animal details",        animalShow);
-        ADD_CMD(status, "Update animal status",       animalUpdateStatus);
-        ADD_CMD(delete, "Delete an animal",           animalDelete);
+        ADD_CMD(buy,    "Buy an animal",             animalBuy);
+        ADD_CMD(sell,   "Sell an animal",            animalSell);
+        ADD_CMD(list,   "List all animals",          animalList);
+        ADD_CMD(show,   "Show animal details",       animalShow);
+        ADD_CMD(status, "Update animal status",      animalUpdateStatus);
+        ADD_CMD(delete, "Delete an animal record",   animalDelete);
     }
 
     return cli.run(argc, argv);
