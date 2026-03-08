@@ -4,7 +4,7 @@
 #include <chrono>
 #include <format>
 
-std::string getCurrentDate(){
+inline std::string getCurrentDate(){
     auto now = std::chrono::system_clock::now();
     auto tt_now = std::chrono::system_clock::to_time_t(now);
     std::tm* tm_now = std::localtime(&tt_now);
