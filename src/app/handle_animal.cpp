@@ -3,8 +3,10 @@
 #include "cli/color.h"
 #include "core/models/animal.h"
 #include "core/models/transaction.h"
+#include "core/models/inventory.h"
 #include "core/animal_service.h"
 #include "core/transaction_service.h"
+#include "core/inventory_service.h"
 #include "cli/cli.h"
 #include "app_state.h"
 #include "utils.h"
@@ -12,6 +14,38 @@
 
 
 static std::string strToGender(const std::string& s) { return s; }
+
+
+
+static i64 ensureInventoryItem(
+    InventoryService* inv_service,
+    const std::string& name,
+    InventoryCategory  category,
+    InventoryUnit      unit)
+{
+    auto items = inv_service->getAllItems();
+    for (const auto& item : items) {
+        if (item.category == category)
+            return item.item_id;
+    }
+
+    Inventory newItem{};
+    newItem.name          = name;
+    newItem.category      = category;
+    newItem.quantity      = 0.0;
+    newItem.unit          = unit;
+    newItem.reorder_level = 0.0;
+
+    inv_service->addItem(newItem);
+
+    auto updated = inv_service->getAllItems();
+    for (const auto& item : updated) {
+        if (item.category == category)
+            return item.item_id;
+    }
+
+    throw std::runtime_error("Failed to create inventory item for: " + name);
+}
 
 
 static void printAnimal(const AnimalRecord& r, bool show_separator = true)
@@ -124,7 +158,6 @@ int animalSell(const Args& args)
         i64 aid = std::stoll(id_str);
 
         AnimalRecord r = animal_service->getAnimalById(aid);
-
         if (r.status != AnimalStatus::ALIVE) {
             color::printError("Only ALIVE animals can be sold");
             return 1;
@@ -153,6 +186,110 @@ int animalSell(const Args& args)
 
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to sell animal: ") + e.what());
+        return 1;
+    }
+
+    return 0;
+}
+
+
+
+int animalCollect(const Args& args)
+{
+    auto* app_state = getAppState(args);
+    if (!app_state) return 1;
+
+    auto* inv_service = app_state->getInventoryService();
+    if (!inv_service) {
+        color::printError("Failed to initialize inventory service");
+        return 1;
+    }
+
+    try {
+        double milk_collected = wx::lineInput<double>("Milk collected today (L): ");
+        double eggs_collected = wx::lineInput<double>("Eggs collected today (count): ");
+
+        if (milk_collected > 0) {
+            i64 milk_id = ensureInventoryItem(
+                inv_service, "Milk",
+                InventoryCategory::MILK, InventoryUnit::LITER
+            );
+            Inventory milk_item = inv_service->getItemById(milk_id);
+            inv_service->updateQuantity(milk_id, milk_item.quantity + milk_collected);
+
+            std::cout << color::GREEN
+                      << "✓ Added " << milk_collected << " L of milk to inventory"
+                      << color::RESET << "\n";
+        }
+
+        if (eggs_collected > 0) {
+            i64 egg_id = ensureInventoryItem(
+                inv_service, "Eggs",
+                InventoryCategory::EGG, InventoryUnit::PIECE
+            );
+            Inventory egg_item = inv_service->getItemById(egg_id);
+            inv_service->updateQuantity(egg_id, egg_item.quantity + eggs_collected);
+
+            std::cout << color::GREEN
+                      << "✓ Added " << eggs_collected << " eggs to inventory"
+                      << color::RESET << "\n";
+        }
+
+    } catch (const std::exception& e) {
+        color::printError(std::string("Failed to record collection: ") + e.what());
+        return 1;
+    }
+
+    return 0;
+}
+
+
+int animalProcess(const Args& args)
+{
+    auto* app_state = getAppState(args);
+    if (!app_state) return 1;
+
+    auto* animal_service = app_state->getAnimalService();
+    auto* inv_service    = app_state->getInventoryService();
+    if (!animal_service || !inv_service) {
+        color::printError("Failed to initialize services");
+        return 1;
+    }
+
+    std::string id_str;
+    loadArg(id_str, 0, "animal_id");
+
+    try {
+        i64 aid = std::stoll(id_str);
+
+        AnimalRecord r = animal_service->getAnimalById(aid);
+
+        if (r.status != AnimalStatus::ALIVE) {
+            color::printError("Only ALIVE animals can be processed for meat");
+            return 1;
+        }
+
+        Animal animal(r);
+        animal.processForMeat();
+
+        const AnimalRecord& updated = animal.getRecord();
+
+        animal_service->updateAnimal(updated);
+
+        i64 meat_id = ensureInventoryItem(
+            inv_service, "Meat",
+            InventoryCategory::OTHER, InventoryUnit::KG
+        );
+        Inventory meat_item = inv_service->getItemById(meat_id);
+        inv_service->updateQuantity(meat_id, meat_item.quantity + updated.meat);
+
+        std::cout << color::GREEN
+                  << "✓ Animal processed — "
+                  << updated.meat << " kg of meat added to inventory"
+                  << color::RESET << "\n";
+
+    } catch (const std::exception& e) {
+        color::printError(std::string("Failed to process animal: ") + e.what());
         return 1;
     }
 
