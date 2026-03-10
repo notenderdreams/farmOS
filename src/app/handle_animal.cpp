@@ -127,7 +127,7 @@ int animalBuy(const Args& args)
         tx_service->addTransaction(tx);
 
         std::cout << color::GREEN
-                  << "✓ Animal purchased and transaction recorded"
+                  << "Animal purchased and transaction recorded"
                   << color::RESET << "\n";
 
     } catch (const std::exception& e) {
@@ -181,7 +181,7 @@ int animalSell(const Args& args)
         tx_service->addTransaction(tx);
 
         std::cout << color::GREEN
-                  << "✓ Animal sold and transaction recorded"
+                  << "Animal sold and transaction recorded"
                   << color::RESET << "\n";
 
     } catch (const std::exception& e) {
@@ -218,7 +218,7 @@ int animalCollect(const Args& args)
             inv_service->updateQuantity(milk_id, milk_item.quantity + milk_collected);
 
             std::cout << color::GREEN
-                      << "✓ Added " << milk_collected << " L of milk to inventory"
+                      << "Added " << milk_collected << " L of milk to inventory"
                       << color::RESET << "\n";
         }
 
@@ -231,7 +231,7 @@ int animalCollect(const Args& args)
             inv_service->updateQuantity(egg_id, egg_item.quantity + eggs_collected);
 
             std::cout << color::GREEN
-                      << "✓ Added " << eggs_collected << " eggs to inventory"
+                      << "Added " << eggs_collected << " eggs to inventory"
                       << color::RESET << "\n";
         }
 
@@ -284,7 +284,7 @@ int animalProcess(const Args& args)
         inv_service->updateQuantity(meat_id, meat_item.quantity + updated.meat);
 
         std::cout << color::GREEN
-                  << "✓ Animal processed — "
+                  << "Animal processed — "
                   << updated.meat << " kg of meat added to inventory"
                   << color::RESET << "\n";
 
@@ -407,7 +407,7 @@ int animalUpdateStatus(const Args& args)
         );
 
         animal_service->updateStatus(aid, new_status);
-        std::cout << color::GREEN << "✓ Animal status updated" << color::RESET << "\n";
+        std::cout << color::GREEN << "Animal status updated" << color::RESET << "\n";
 
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to update animal status: ") + e.what());
@@ -435,7 +435,7 @@ int animalDelete(const Args& args)
     try {
         i64 aid = std::stoll(id_str);
         animal_service->deleteAnimal(aid);
-        std::cout << color::GREEN << "✓ Animal deleted" << color::RESET << "\n";
+        std::cout << color::GREEN << "Animal deleted" << color::RESET << "\n";
 
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to delete animal: ") + e.what());
