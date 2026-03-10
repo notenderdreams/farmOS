@@ -30,7 +30,7 @@ T lineInput(const std::string& prompt)
     return value;
 }
 template<>
-std::string lineInput<std::string>(const std::string& prompt)
+inline std::string lineInput<std::string>(const std::string& prompt)
 {
     std::string value;
     std::cout<<color::GREEN<< prompt << color::RESET;
