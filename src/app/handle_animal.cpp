@@ -268,6 +268,11 @@ int animalProcess(const Args& args)
             color::printError("Only ALIVE animals can be processed for meat");
             return 1;
         }
+        if (r.weight < 200.0) {
+            color::printError( "Animal does not meet the minimum weight for processing (200 kg). "
+                                    "Current weight: " + std::to_string(r.weight) + " kg");
+    return 1;
+}
 
         Animal animal(r);
         animal.processForMeat();
