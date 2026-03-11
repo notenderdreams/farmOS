@@ -10,7 +10,7 @@ public:
     AnimalService(sqlite3* db);
     AnimalService(const std::string& db_path);
 
-    void initTable();
+    void initTable() override;
 
     void addAnimal(const AnimalRecord& record);
     std::vector<AnimalRecord> getAllAnimals();

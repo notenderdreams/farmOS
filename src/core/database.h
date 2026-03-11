@@ -15,6 +15,8 @@ public:
     bool execute(const std::string& sql);
     sqlite3_stmt* prepare(const std::string& sql);
 
+    virtual void initTable() = 0;
+
 protected:
     sqlite3* db;
 };
