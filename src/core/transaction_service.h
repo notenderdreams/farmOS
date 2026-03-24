@@ -12,7 +12,7 @@ public:
     TransactionService(sqlite3* db) ;
     TransactionService(const std::string& db_path) ;
     
-    void initTable() ;
+    void initTable() override;
     void addTransaction(const Transaction& tx) ;
     std::vector<Transaction> getAllTransactions() ;
     Transaction getTransactionById(i64 tid) ;
