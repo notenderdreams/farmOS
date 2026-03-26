@@ -64,6 +64,23 @@ void AppState::ensureInventoryService() {
     }
 }
 
+InventoryService* AppState::getInventoryService() {
+    ensureInventoryService();
+    return _inv_service;
+}
+
+void AppState::ensureInventoryService() {
+    if (!_inv_service) {
+        try {
+            _inv_service = new InventoryService(_db_path);
+            _inv_service->initTable();
+        } catch (const std::exception& e) {
+            color::printError(std::string("Failed to initialize inventory service: ") + e.what());
+        }
+    }
+}
+
+
 AppState* getAppState(const Args& args) {
     if (!args.cli) {
         color::printError("CLI context not available");

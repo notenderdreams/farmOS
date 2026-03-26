@@ -15,6 +15,7 @@ public:
     AnimalService*      getAnimalService();
     InventoryService* getInventoryService();
 
+
     const std::string& getDbPath() const { return _db_path; }
 
 private:
