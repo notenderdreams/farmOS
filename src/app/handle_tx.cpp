@@ -41,7 +41,7 @@ int txAdd(const Args& args) {
     
     try {
         tx_service->addTransaction(tx);
-        std::cout << color::GREEN << "Transaction added successfully" << color::RESET << "\n";
+        std::cout << color::GREEN << "✓ Transaction added successfully" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to add transaction: ") + e.what());
         return 1;
@@ -156,7 +156,7 @@ int txUpdateStatus(const Args& args) {
         );
 
         tx_service->updateStatus(tid, new_status);
-        std::cout << color::GREEN << "Transaction status updated" << color::RESET << "\n";
+        std::cout << color::GREEN << "✓ Transaction status updated" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to update transaction: ") + e.what());
         return 1;
