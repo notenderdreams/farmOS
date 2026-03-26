@@ -13,7 +13,8 @@ public:
 
     TransactionService* getTransactionService();
     AnimalService*      getAnimalService();
-    InventoryService*   getInventoryService();
+    InventoryService* getInventoryService();
+
 
     const std::string& getDbPath() const { return _db_path; }
 
@@ -25,7 +26,8 @@ private:
     std::string         _db_path;
     TransactionService* _tx_service;
     AnimalService*      _animal_service;
-    InventoryService*   _inv_service;
+    InventoryService* _inv_service;
+
 };
 
 AppState* getAppState(const Args& args);

@@ -10,12 +10,13 @@ namespace tx {
 	{
 		switch (t)
 		{
+		case TransactionType::SELL:
+			return TransactionDirection::IN;
 		case TransactionType::BILLS :
 		case TransactionType::BUY :
 		case TransactionType::SALARY :
+		default:
 			return TransactionDirection::OUT;
-		case TransactionType::SELL:
-			return TransactionDirection::IN;
 		}
 	}
 }

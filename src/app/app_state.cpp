@@ -6,8 +6,7 @@ AppState::AppState(const std::string& db_path)
     : _db_path(db_path),
       _tx_service(nullptr),
       _animal_service(nullptr),
-      _inv_service(nullptr) {
-}
+      _inv_service(nullptr) {}
 
 AppState::~AppState() {
     delete _tx_service;
@@ -49,6 +48,21 @@ void AppState::ensureAnimalService() {
     }
 }
 
+InventoryService* AppState::getInventoryService() {
+    ensureInventoryService();
+    return _inv_service;
+}
+
+void AppState::ensureInventoryService() {
+    if (!_inv_service) {
+        try {
+            _inv_service = new InventoryService(_db_path);
+            _inv_service->initTable();
+        } catch (const std::exception& e) {
+            color::printError(std::string("Failed to initialize inventory service: ") + e.what());
+        }
+    }
+}
 
 InventoryService* AppState::getInventoryService() {
     ensureInventoryService();

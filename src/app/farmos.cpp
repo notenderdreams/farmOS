@@ -3,6 +3,8 @@
 #include "app_state.h"
 #include "handle_tx.h"
 #include "handle_animal.h"
+#include "handle_inventory.h"
+
 
 int main(int argc, char** argv) {
     CLI cli("farmos");
@@ -26,6 +28,15 @@ int main(int argc, char** argv) {
         ADD_CMD(status,  "Update animal status",           animalUpdateStatus);
         ADD_CMD(delete,  "Delete an animal record",        animalDelete);
     }
+
+    REG_MOD(cli, inventory, "Inventory management") {
+        ADD_CMD(add,    "Add item & log purchase",         inventoryAdd);
+        ADD_CMD(list,   "List all items",                  inventoryList);
+        ADD_CMD(show,   "Show item details",               inventoryShow);
+        ADD_CMD(update, "Update quantity & log transaction", inventoryUpdateQuantity);
+        ADD_CMD(delete, "Delete an item",                  inventoryDelete);
+    }
+
 
     return cli.run(argc, argv);
 }
