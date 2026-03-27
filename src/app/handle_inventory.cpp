@@ -96,7 +96,7 @@ int inventoryAdd(const Args& args) {
 
     try {
         inv_service->addItem(item);
-        std::cout << color::GREEN << "✓ Item added successfully" << color::RESET << "\n";
+        std::cout << color::GREEN << "Item added successfully" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to add item: ") + e.what());
         return 1;
@@ -114,7 +114,7 @@ int inventoryAdd(const Args& args) {
                     "Initial stock purchase: " + item.name
                 );
                 std::cout << color::GREY
-                          << "  ↳ BUY transaction logged"
+                          << "  BUY transaction logged"
                           << color::RESET << "\n";
             } catch (const std::exception& e) {
                 color::printError(std::string("Failed to log transaction: ") + e.what());
@@ -217,7 +217,7 @@ int inventoryUpdateQuantity(const Args& args) {
         double new_q = wx::lineInput<double>("New quantity: ");
 
         inv_service->updateQuantity(iid, new_q);
-        std::cout << color::GREEN << "✓ Quantity updated" << color::RESET << "\n";
+        std::cout << color::GREEN << "Quantity updated" << color::RESET << "\n";
 
 
         if (tx_service && new_q != old_q) {
@@ -236,7 +236,7 @@ int inventoryUpdateQuantity(const Args& args) {
                             + inv::toStr(item.unit) + ")"
                     );
                     std::cout << color::GREY
-                              << "  ↳ BUY transaction logged"
+                              << "  BUY transaction logged"
                               << color::RESET << "\n";
                 } 
                 else {
@@ -250,7 +250,7 @@ int inventoryUpdateQuantity(const Args& args) {
                             + inv::toStr(item.unit) + ")"
                     );
                     std::cout << color::GREY
-                              << "  ↳ SELL transaction logged"
+                              << "  SELL transaction logged"
                               << color::RESET << "\n";
                 }
             }
@@ -281,7 +281,7 @@ int inventoryDelete(const Args& args) {
     try {
         i64 iid = std::stoll(id_str);
         inv_service->deleteItem(iid);
-        std::cout << color::GREEN << "✓ Item deleted" << color::RESET << "\n";
+        std::cout << color::GREEN << "Item deleted" << color::RESET << "\n";
 
     } 
     catch (const std::exception& e) {
