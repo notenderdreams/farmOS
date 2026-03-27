@@ -4,64 +4,29 @@
 
 AppState::AppState(const std::string& db_path)
     : _db_path(db_path),
+      _db(nullptr),
       _tx_service(nullptr),
       _animal_service(nullptr),
-      _inv_service(nullptr) {}
+      _inv_service(nullptr) {
+    try {
+        auto conn = Database::getConn(_db_path);
+        _db = conn;
+        _tx_service = new TransactionService(conn);
+        _animal_service = new AnimalService(conn);
+        _inv_service = new InventoryService(conn);
+
+        _tx_service->initTable();
+        _animal_service->initTable();
+        _inv_service->initTable();
+    } catch (const std::exception& e) {
+        color::printError(std::string("Failed to initialize services: ") + e.what());
+    }
+}
 
 AppState::~AppState() {
     delete _tx_service;
     delete _animal_service;
     delete _inv_service;
-}
-
-
-TransactionService* AppState::getTransactionService() {
-    ensureTransactionService();
-    return _tx_service;
-}
-
-void AppState::ensureTransactionService() {
-    if (!_tx_service) {
-        try {
-            _tx_service = new TransactionService(_db_path);
-            _tx_service->initTable();
-        } catch (const std::exception& e) {
-            color::printError(std::string("Failed to initialize transaction service: ") + e.what());
-        }
-    }
-}
-
-
-AnimalService* AppState::getAnimalService() {
-    ensureAnimalService();
-    return _animal_service;
-}
-
-void AppState::ensureAnimalService() {
-    if (!_animal_service) {
-        try {
-            _animal_service = new AnimalService(_db_path);
-            _animal_service->initTable();
-        } catch (const std::exception& e) {
-            color::printError(std::string("Failed to initialize animal service: ") + e.what());
-        }
-    }
-}
-
-InventoryService* AppState::getInventoryService() {
-    ensureInventoryService();
-    return _inv_service;
-}
-
-void AppState::ensureInventoryService() {
-    if (!_inv_service) {
-        try {
-            _inv_service = new InventoryService(_db_path);
-            _inv_service->initTable();
-        } catch (const std::exception& e) {
-            color::printError(std::string("Failed to initialize inventory service: ") + e.what());
-        }
-    }
 }
 
 AppState* getAppState(const Args& args) {
