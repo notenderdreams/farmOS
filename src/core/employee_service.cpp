@@ -6,7 +6,7 @@
 EmployeeService::EmployeeService(const std::string& db_path) : Database(db_path) {}
 EmployeeService::EmployeeService(sqlite3* db)                : Database(db)       {}
 
-void EmployeeService::initTables()
+void EmployeeService::initTable()
 {
     execute(std::string(farmos::models::EMPLOYEES_TABLE));
     execute(std::string(farmos::models::LEAVE_REQUESTS_TABLE));

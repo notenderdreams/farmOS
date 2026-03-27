@@ -10,7 +10,7 @@ public:
     EmployeeService(const std::string& db_path);
     EmployeeService(sqlite3* db);
 
-    void initTables();
+    void initTable();
 
     // ── Employee CRUD ─────────────────────────────────────────────────────────
     void                        addEmployee    (const EmployeeRecord& r);

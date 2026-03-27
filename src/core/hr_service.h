@@ -12,7 +12,7 @@ public:
     HRService(const std::string& db_path);
     HRService(sqlite3* db);
 
-    void initTables();
+    void initTable();
 
     // ── HR staff ──────────────────────────────────────────────────────────────
     void                   addHRStaff        (const HRRecord& r);

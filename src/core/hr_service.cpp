@@ -8,7 +8,7 @@
 HRService::HRService(const std::string& db_path) : Database(db_path) {}
 HRService::HRService(sqlite3* db)                : Database(db)       {}
 
-void HRService::initTables()
+void HRService::initTable()
 {
     execute(std::string(farmos::models::HR_STAFF_TABLE));
     execute(std::string(farmos::models::VACANCIES_TABLE));
