@@ -13,7 +13,6 @@ void EmployeeService::initTable()
     execute(std::string(farmos::models::RAISE_REQUESTS_TABLE));
 }
 
-// ── Row readers ───────────────────────────────────────────────────────────────
 
 static EmployeeRecord rowToEmployee(sqlite3_stmt* s)
 {
@@ -54,7 +53,7 @@ static RaiseRequest rowToRaise(sqlite3_stmt* s)
     return r;
 }
 
-// ── Employee CRUD ─────────────────────────────────────────────────────────────
+
 
 void EmployeeService::addEmployee(const EmployeeRecord& r)
 {
@@ -122,7 +121,7 @@ void EmployeeService::deleteEmployee(i64 id)
     sqlite3_finalize(stmt);
 }
 
-// ── Leave ─────────────────────────────────────────────────────────────────────
+
 
 void EmployeeService::askLeave(const LeaveRequest& r)
 {
@@ -200,7 +199,7 @@ void EmployeeService::updateLeaveStatus(
     }
 }
 
-// ── Raise ─────────────────────────────────────────────────────────────────────
+//  Raise 
 
 void EmployeeService::askRaise(const RaiseRequest& r)
 {
@@ -276,7 +275,7 @@ void EmployeeService::updateRaiseStatus(
     }
 }
 
-// ── Accountant queries ────────────────────────────────────────────────────────
+//  Accountant queries 
 
 std::vector<RaiseRequest> EmployeeService::getApprovedRaises()
 {

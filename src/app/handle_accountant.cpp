@@ -28,27 +28,23 @@ static bool requireAccountant(AppState* state)
 
 // ── Salary → Transaction helper ───────────────────────────────────────────────
 //
-// Creates a single EXPENSE transaction that represents a salary payment.
-// ref_note  — shows up as the transaction description, e.g.
-//             "Salary [YYYY-MM]: Alice (ID:3)"
-// amount    — the salary value (positive; stored as EXPENSE internally)
-//
-// Returns true on success; prints an error and returns false on failure.
+// Creates a SALARY transaction for payroll.
+// ref_note  — shows up as the transaction description
+// amount    — salary value
 
 static bool recordSalaryTransaction(TransactionService* tx_svc,
                                     const std::string&  ref_note,
                                     f64                 amount)
 {
     Transaction tx;
-    tx.type        = TransactionType::EXPENSE;   // salary is a farm outflow
-    tx.category    = "SALARY";
-    tx.description = ref_note;
+    tx.type        = TransactionType::SALARY;
+    tx.direction   = TransactionDirection::OUT;
+    tx.entity_type = TransactionEntityType::EMPLOYEE;
+    tx.entity_id   = "";
+    tx.description = "[SALARY] " + ref_note;
     tx.amount      = amount;
     tx.status      = TransactionStatus::COMPLETED;
-
-    // Use today's date (CURRENT_TIMESTAMP handled by DB default,
-    // but we populate date explicitly to match the payroll month context)
-    tx.date = "";   // empty → service uses CURRENT_TIMESTAMP
+    tx.date        = getCurrentDate();
 
     try {
         tx_svc->addTransaction(tx);
@@ -59,7 +55,7 @@ static bool recordSalaryTransaction(TransactionService* tx_svc,
     }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Helpers 
 
 static void printSalaryRow(const EmployeeRecord& e)
 {
@@ -70,7 +66,7 @@ static void printSalaryRow(const EmployeeRecord& e)
               << "\n";
 }
 
-// ── Commands ──────────────────────────────────────────────────────────────────
+// ── Commands 
 
 // View all employees with current salary + total payroll
 int accountantSalaries(const Args& args)
@@ -115,7 +111,7 @@ int accountantSalaries(const Args& args)
     return 0;
 }
 
-// View all approved raises with employee, amount, and date
+// View all approved raises
 int accountantRaiseHistory(const Args& args)
 {
     auto* state = getAppState(args);
@@ -164,15 +160,7 @@ int accountantRaiseHistory(const Args& args)
     return 0;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// accountantPayroll  <YYYY-MM>
-//
-// 1. Lists every active employee on the payroll for the given month.
-// 2. Asks the accountant to confirm disbursement.
-// 3. On confirmation, records one EXPENSE transaction per employee
-//    (category=SALARY, description="Salary [YYYY-MM]: <name> (ID:<id>)").
-// 4. Prints a summary showing total transactions recorded.
-// ─────────────────────────────────────────────────────────────────────────────
+// Accountant payroll command <YYYY-MM>
 int accountantPayroll(const Args& args)
 {
     auto* state = getAppState(args);
@@ -199,7 +187,6 @@ int accountantPayroll(const Args& args)
             return 0;
         }
 
-        // ── Display report ────────────────────────────────────────────────────
         std::cout << color::BLUE << "\n  Payroll Report — " << month << "\n" << color::RESET;
         color::printSeperator();
         std::cout << "  " << std::left << std::setw(6)  << "ID"
@@ -226,7 +213,6 @@ int accountantPayroll(const Args& args)
                   << std::fixed << std::setprecision(2) << total
                   << color::RESET << "\n\n";
 
-        // ── Confirm disbursement ──────────────────────────────────────────────
         std::cout << color::YELLOW
                   << "  Record salary disbursements as transactions? [y/N]: "
                   << color::RESET;
@@ -239,16 +225,12 @@ int accountantPayroll(const Args& args)
             return 0;
         }
 
-        // ── Record one EXPENSE transaction per employee ────────────────────────
         int recorded = 0;
         int failed   = 0;
         for (const auto& e : employees) {
-            // Build a clear, searchable description
-            // e.g.  "Salary [2025-03]: Alice (ID:3)"
             std::ostringstream desc;
             desc << "Salary [" << month << "]: " << e.name
                  << " (ID:" << e.employee_id << ")";
-
             if (recordSalaryTransaction(tx_svc, desc.str(), e.salary))
                 ++recorded;
             else
@@ -257,11 +239,11 @@ int accountantPayroll(const Args& args)
 
         color::printSeperator();
         std::cout << color::GREEN
-                  << "  ✓ Transactions recorded : " << recorded << "\n"
+                  << "  Transactions recorded : " << recorded << "\n"
                   << color::RESET;
         if (failed > 0)
             std::cout << color::YELLOW
-                      << "  ⚠ Failed to record     : " << failed << "\n"
+                      << "  Failed to record     : " << failed << "\n"
                       << color::RESET;
         std::cout << "  Tip: run 'farmos tx list' to verify.\n\n";
 
@@ -271,12 +253,7 @@ int accountantPayroll(const Args& args)
     return 0;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// accountantAdjustSalary  <employee_id>
-//
-// Same as before but now also records a SALARY_ADJUSTMENT transaction so the
-// raise delta is visible in the transaction ledger.
-// ─────────────────────────────────────────────────────────────────────────────
+// Accountant adjust salary
 int accountantAdjustSalary(const Args& args)
 {
     auto* state = getAppState(args);
@@ -295,10 +272,9 @@ int accountantAdjustSalary(const Args& args)
         i64 eid = std::stoll(id_str);
         EmployeeRecord e = svc->getEmployeeById(eid);
 
-        // Must have at least one approved raise
         auto raises = svc->getRaiseByEmployee(eid);
         bool has_approved = false;
-        f64  latest_approved_salary = 0.0;
+        f64 latest_approved_salary = 0.0;
         for (const auto& r : raises) {
             if (r.status == RaiseStatus::APPROVED) {
                 has_approved = true;
@@ -329,17 +305,13 @@ int accountantAdjustSalary(const Args& args)
 
         f64 delta = new_salary - e.salary;
 
-        // ── Persist the new salary ────────────────────────────────────────────
         svc->updateSalary(eid, new_salary);
         std::cout << color::GREEN
-                  << "  ✓ Salary updated to $"
+                  << "  Salary updated to $"
                   << std::fixed << std::setprecision(2) << new_salary
                   << " for " << e.name
                   << color::RESET << "\n";
 
-        // ── Record the raise delta as a transaction ───────────────────────────
-        // The delta is the one-off adjustment amount (positive = increase).
-        // We log it as EXPENSE so it appears in the ledger as a cost to the farm.
         if (delta != 0.0) {
             std::ostringstream desc;
             desc << "Salary adjustment: " << e.name
@@ -349,16 +321,18 @@ int accountantAdjustSalary(const Args& args)
                  << " (approved raise)";
 
             Transaction tx;
-            tx.type        = TransactionType::EXPENSE;
-            tx.category    = "SALARY_ADJUSTMENT";
-            tx.description = desc.str();
-            tx.amount      = (delta > 0 ? delta : -delta);  // always positive amount
+            tx.type        = TransactionType::SALARY;
+            tx.direction   = TransactionDirection::OUT;
+            tx.entity_type = TransactionEntityType::EMPLOYEE;
+            tx.entity_id   = std::to_string(eid);
+            tx.description = "[SALARY_ADJUSTMENT] " + desc.str();
+            tx.amount      = (delta > 0 ? delta : -delta);
             tx.status      = TransactionStatus::COMPLETED;
-            tx.date        = "";
+            tx.date        = getCurrentDate();
 
             tx_svc->addTransaction(tx);
             std::cout << color::GREY
-                      << "  → Transaction recorded (SALARY_ADJUSTMENT, $"
+                      << "   Transaction recorded (SALARY_ADJUSTMENT, $"
                       << std::fixed << std::setprecision(2) << std::abs(delta) << ")\n"
                       << color::RESET;
         }

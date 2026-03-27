@@ -13,7 +13,6 @@ int main(int argc, char** argv) {
     auto* state = new AppState("../../farm.db");
     cli.registerState(state);
 
-    // ── Session login ─────────────────────────────────────────────────────────
     // Ask for HR ID at startup — load role from DB — enforce per command
     {
         auto* hr_svc = state->getHRService();
@@ -41,7 +40,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    // ── Transactions ──────────────────────────────────────────────────────────
+    // ── Transactions 
     REG_MOD(cli, tx, "Transaction management") {
         ADD_CMD(add,    "Add a new transaction",     txAdd);
         ADD_CMD(list,   "List all transactions",     txList);
@@ -49,7 +48,7 @@ int main(int argc, char** argv) {
         ADD_CMD(status, "Update transaction status", txUpdateStatus);
     }
 
-    // ── Animals ───────────────────────────────────────────────────────────────
+    // ── Animals 
     REG_MOD(cli, animal, "Animal management") {
         ADD_CMD(buy,    "Buy an animal",             animalBuy);
         ADD_CMD(sell,   "Sell an animal",            animalSell);
@@ -59,7 +58,7 @@ int main(int argc, char** argv) {
         ADD_CMD(delete, "Delete an animal record",   animalDelete);
     }
 
-    // ── Employees ─────────────────────────────────────────────────────────────
+    // ── Employees 
     // Note: employees can only be added via hiring process (farmos hiring hire)
     REG_MOD(cli, employee, "Employee management") {
         ADD_CMD(list,      "List all employees",              employeeList);
@@ -70,13 +69,13 @@ int main(int argc, char** argv) {
         ADD_CMD(raiselist, "List all raise requests",         employeeRaiseList);
     }
 
-    // ── HR staff management ───────────────────────────────────────────────────
+    // ── HR staff management 
     REG_MOD(cli, hr, "HR staff management") {
         ADD_CMD(add,  "Add HR staff member",  hrStaffAdd);
         ADD_CMD(list, "List all HR staff",    hrStaffList);
     }
 
-    // ── Manager actions ───────────────────────────────────────────────────────
+    // ── Manager actions 
     REG_MOD(cli, manager, "Manager actions") {
         ADD_CMD(vacancy,      "Create a job vacancy",                vacancyCreate);
         ADD_CMD(vacancylist,  "List all vacancies",                  vacancyList);
@@ -86,26 +85,26 @@ int main(int argc, char** argv) {
         ADD_CMD(deletemp,     "Delete an employee <employee_id>",    managerDeleteEmployee);
     }
 
-    // ── Applicant actions ─────────────────────────────────────────────────────
+    // ── Applicant actions 
     REG_MOD(cli, applicant, "Applicant actions") {
         ADD_CMD(apply,  "Apply for a job",         applicantApply);
         ADD_CMD(list,   "List all applicants",     applicantList);
     }
 
-    // ── Hiring officer actions ────────────────────────────────────────────────
+    // ── Hiring officer actions 
     REG_MOD(cli, hiring, "Hiring officer actions") {
         ADD_CMD(hire,   "Hire an applicant <applicant_id>",   hiringOfficerHire);
         ADD_CMD(reject, "Reject an applicant <applicant_id>", hiringOfficerReject);
     }
 
-    // ── Attendance officer actions ────────────────────────────────────────────
+    // ── Attendance officer actions 
     REG_MOD(cli, attendance, "Attendance officer actions") {
         ADD_CMD(mark,       "Mark attendance <employee_id>",        attendanceMark);
         ADD_CMD(byemployee, "View attendance <employee_id>",        attendanceByEmployee);
         ADD_CMD(bydate,     "View attendance by date <YYYY-MM-DD>", attendanceByDate);
     }
 
-    // ── Accountant actions ────────────────────────────────────────────────────
+    // ── Accountant actions 
     REG_MOD(cli, accountant, "Accountant actions") {
         ADD_CMD(salaries,     "View all employees + total payroll",       accountantSalaries);
         ADD_CMD(raisehistory, "View all approved raises",                 accountantRaiseHistory);

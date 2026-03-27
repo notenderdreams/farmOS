@@ -7,7 +7,7 @@
 #include "core/models/employee.h"
 #include <iostream>
 
-// ── Print helpers ─────────────────────────────────────────────────────────────
+// ── Print helpers 
 
 static void printEmployee(const EmployeeRecord& r, bool sep = true)
 {
@@ -43,7 +43,7 @@ static void printRaise(const RaiseRequest& r, bool sep = true)
     if (sep) color::printSeperator();
 }
 
-// ── Employee commands ─────────────────────────────────────────────────────────
+// ── Employee commands 
 
 int employeeAdd(const Args& args)
 {
@@ -61,7 +61,7 @@ int employeeAdd(const Args& args)
 
     try {
         svc->addEmployee(r);
-        std::cout << color::GREEN << "✓ Employee added" << color::RESET << "\n";
+        std::cout << color::GREEN << " Employee added" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
@@ -122,14 +122,14 @@ int employeeDelete(const Args& args)
 
     try {
         svc->deleteEmployee(std::stoll(id_str));
-        std::cout << color::GREEN << "✓ Employee deleted" << color::RESET << "\n";
+        std::cout << color::GREEN << " Employee deleted" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
     return 0;
 }
 
-// ── Leave ─────────────────────────────────────────────────────────────────────
+// ── Leave 
 
 int employeeAskLeave(const Args& args)
 {
@@ -149,7 +149,7 @@ int employeeAskLeave(const Args& args)
         r.reason      = wx::lineInput<std::string>("Reason: ");
 
         svc->askLeave(r);
-        std::cout << color::GREEN << "✓ Leave request submitted" << color::RESET << "\n";
+        std::cout << color::GREEN << "Leave request submitted" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
@@ -175,7 +175,7 @@ int employeeLeaveList(const Args& args)
     return 0;
 }
 
-// ── Raise ─────────────────────────────────────────────────────────────────────
+// ── Raise 
 
 int employeeAskRaise(const Args& args)
 {

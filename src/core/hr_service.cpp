@@ -16,7 +16,7 @@ void HRService::initTable()
     execute(std::string(farmos::models::ATTENDANCE_TABLE));
 }
 
-// ── Row readers ───────────────────────────────────────────────────────────────
+// ── Row readers 
 
 static HRRecord rowToHR(sqlite3_stmt* s)
 {
@@ -63,7 +63,7 @@ static AttendanceRecord rowToAttendance(sqlite3_stmt* s)
     return r;
 }
 
-// ── HR Staff ──────────────────────────────────────────────────────────────────
+//  HR Staff 
 
 void HRService::addHRStaff(const HRRecord& r)
 {
@@ -109,7 +109,7 @@ HRRecord HRService::getHRByEmployeeId(i64 employee_id)
     throw std::runtime_error("DB: No HR staff found for that employee ID");
 }
 
-// ── Vacancy ───────────────────────────────────────────────────────────────────
+//  Vacancy 
 
 void HRService::createVacancy(const VacancyRecord& v)
 {
@@ -157,7 +157,6 @@ void HRService::fillVacancy(i64 id)
     sqlite3_finalize(stmt);
 }
 
-// ── Applicant ─────────────────────────────────────────────────────────────────
 
 void HRService::addApplicant(const ApplicantRecord& a)
 {
@@ -208,7 +207,6 @@ void HRService::updateApplicantStatus(i64 id, ApplicantStatus s)
     sqlite3_finalize(stmt);
 }
 
-// ── Hire ──────────────────────────────────────────────────────────────────────
 
 EmployeeRecord HRService::hireApplicant(i64 applicant_id,
                                          f64 starting_salary,
@@ -242,7 +240,6 @@ EmployeeRecord HRService::hireApplicant(i64 applicant_id,
     return emp;
 }
 
-// ── Attendance ────────────────────────────────────────────────────────────────
 
 void HRService::markAttendance(const AttendanceRecord& r)
 {

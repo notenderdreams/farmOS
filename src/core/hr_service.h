@@ -14,33 +14,28 @@ public:
 
     void initTable();
 
-    // ── HR staff ──────────────────────────────────────────────────────────────
     void                   addHRStaff        (const HRRecord& r);
     std::vector<HRRecord>  getAllHRStaff     ();
     HRRecord               getHRById        (i64 hr_id);
     HRRecord               getHRByEmployeeId(i64 employee_id);  // ← new
 
-    // ── Vacancy (Manager only) ────────────────────────────────────────────────
     void                       createVacancy  (const VacancyRecord& v);
     std::vector<VacancyRecord> getAllVacancies ();
     std::vector<VacancyRecord> getOpenVacancies();
     void                       closeVacancy   (i64 vacancy_id);
     void                       fillVacancy    (i64 vacancy_id);
 
-    // ── Applicant ─────────────────────────────────────────────────────────────
     void                          addApplicant   (const ApplicantRecord& a);
     std::vector<ApplicantRecord>  getAllApplicants();
     ApplicantRecord               getApplicantById(i64 applicant_id);
     void                          updateApplicantStatus(i64 applicant_id, ApplicantStatus s);
 
-    // ── Hire (HiringOfficer) ──────────────────────────────────────────────────
     // Validates vacancy is OPEN, marks applicant SELECTED, marks vacancy FILLED,
     // returns a ready EmployeeRecord for the caller to persist via EmployeeService
     EmployeeRecord hireApplicant(i64 applicant_id,
                                  f64 starting_salary,
                                  const std::string& join_date);
 
-    // ── Attendance (AttendanceOfficer only) ───────────────────────────────────
     void                          markAttendance    (const AttendanceRecord& r);
     // Called automatically when Manager approves leave —
     // marks each date in range as GRANTED_LEAVE

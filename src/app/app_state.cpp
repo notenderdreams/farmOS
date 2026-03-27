@@ -41,7 +41,7 @@ EmployeeService* AppState::getEmployeeService() {
 }
 void AppState::ensureEmployeeService() {
     if (!_employee_service) {
-        try { _employee_service = new EmployeeService(_db_path); _employee_service->initTables(); }
+        try { _employee_service = new EmployeeService(_db_path); _employee_service->initTable(); }
         catch (const std::exception& e) { color::printError(std::string("Employee service: ") + e.what()); }
     }
 }
@@ -51,7 +51,7 @@ HRService* AppState::getHRService() {
 }
 void AppState::ensureHRService() {
     if (!_hr_service) {
-        try { _hr_service = new HRService(_db_path); _hr_service->initTables(); }
+        try { _hr_service = new HRService(_db_path); _hr_service->initTable(); }
         catch (const std::exception& e) { color::printError(std::string("HR service: ") + e.what()); }
     }
 }

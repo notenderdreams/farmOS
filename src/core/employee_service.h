@@ -12,7 +12,6 @@ public:
 
     void initTable();
 
-    // ── Employee CRUD ─────────────────────────────────────────────────────────
     void                        addEmployee    (const EmployeeRecord& r);
     std::vector<EmployeeRecord> getAllEmployees ();
     EmployeeRecord              getEmployeeById(i64 employee_id);
@@ -20,7 +19,6 @@ public:
     void                        updateSalary   (i64 employee_id, f64 new_salary);
     void                        deleteEmployee (i64 employee_id);
 
-    // ── Leave (employee asks) ─────────────────────────────────────────────────
     void                      askLeave          (const LeaveRequest& r);
     std::vector<LeaveRequest> getAllLeaveRequests();
     std::vector<LeaveRequest> getLeaveByEmployee(i64 employee_id);
@@ -31,7 +29,6 @@ public:
     void updateLeaveStatus(i64 request_id, LeaveStatus s,
                            std::function<void(i64, const std::string&, const std::string&)> on_approved = nullptr);
 
-    // ── Raise (employee asks) ─────────────────────────────────────────────────
     void                      askRaise          (const RaiseRequest& r);
     std::vector<RaiseRequest> getAllRaiseRequests();
     std::vector<RaiseRequest> getRaiseByEmployee(i64 employee_id);
@@ -42,7 +39,6 @@ public:
     void updateRaiseStatus(i64 request_id, RaiseStatus s,
                            std::function<void(i64, f64)> on_approved = nullptr);
 
-    // ── Accountant queries ────────────────────────────────────────────────────
     std::vector<RaiseRequest> getApprovedRaises();                        // raise history
     std::vector<EmployeeRecord> getPayrollForMonth(const std::string& month); // YYYY-MM
 };

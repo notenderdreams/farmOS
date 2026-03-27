@@ -12,8 +12,10 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <iomanip>
 
-// ── Role enforcement ──────────────────────────────────────────────────────────
+
+// ── Role enforcement 
 
 static bool requireRole(AppState* state, HRRole required)
 {
@@ -32,7 +34,7 @@ static bool requireRole(AppState* state, HRRole required)
     return true;
 }
 
-// ── Salary → Transaction helper ───────────────────────────────────────────────
+// ── Salary → Transaction helper 
 //
 // Shared by both hire (SALARY_INIT) and raise-approve (SALARY_ADJUSTMENT).
 // Silently logs on failure so that the primary operation is never blocked.
@@ -46,13 +48,12 @@ static void tryRecordSalaryTx(TransactionService* tx_svc,
     if (!tx_svc || amount <= 0.0) return;
     try {
         Transaction tx;
-        tx.type        = TransactionType::EXPENSE;          // salary = farm outflow
-        tx.direction   = TransactionDirection::OUT;         // always OUT
-        tx.category    = category;
+        tx.type        = TransactionType::SALARY;
+        tx.direction   = TransactionDirection::OUT;
         tx.amount      = amount;
         tx.entity_type = TransactionEntityType::EMPLOYEE;
         tx.entity_id   = entity_id;
-        tx.description = description;
+        tx.description = "[" + category + "] " + description;  // category preserved here
         tx.date        = getCurrentDate();
         tx.status      = TransactionStatus::COMPLETED;
         tx_svc->addTransaction(tx);
@@ -62,7 +63,7 @@ static void tryRecordSalaryTx(TransactionService* tx_svc,
     }
 }
 
-// ── Print helpers ─────────────────────────────────────────────────────────────
+// ── Print helpers 
 
 static void printHRStaff(const HRRecord& r, bool sep = true)
 {
@@ -102,7 +103,7 @@ static void printAttendance(const AttendanceRecord& r, bool sep = true)
     if (sep) color::printSeperator();
 }
 
-// ── HR Staff ──────────────────────────────────────────────────────────────────
+// ── HR Staff 
 
 int hrStaffAdd(const Args& args)
 {
@@ -113,7 +114,7 @@ int hrStaffAdd(const Args& args)
     auto* tx_svc  = state->getTransactionService();
     if (!hr_svc || !emp_svc) { color::printError("Service unavailable"); return 1; }
 
-    // ── Collect all info upfront ──────────────────────────────────────────────
+    // ── Collect all info upfront 
     std::cout << color::BLUE << "\n  Add HR Staff Member\n" << color::RESET;
     color::printSeperator();
 
@@ -124,7 +125,7 @@ int hrStaffAdd(const Args& args)
     if (salary <= 0) { color::printError("Salary must be greater than 0"); return 1; }
     std::string jdate  = wx::lineInput<std::string>("Join Date (YYYY-MM-DD): ");
 
-    // ── Confirm ───────────────────────────────────────────────────────────────
+    // ── Confirm 
     std::cout << color::BLUE << "\n  Confirm:\n" << color::RESET;
     color::printSeperator();
     std::cout << "  Name   : " << name             << "\n"
@@ -141,7 +142,7 @@ int hrStaffAdd(const Args& args)
     }
 
     try {
-        // ── Step 1: create employee record (department = HR) ──────────────────
+        // ── Step 1: create employee record (department = HR) 
         EmployeeRecord emp;
         emp.name       = name;
         emp.department = EmployeeDepartment::HR;
@@ -157,14 +158,14 @@ int hrStaffAdd(const Args& args)
             if (!all.empty()) emp_id = all.back().employee_id;
         } catch (...) {}
 
-        // ── Step 2: create HR staff record linked to that employee ────────────
+        // ── Step 2: create HR staff record linked to that employee 
         HRRecord r;
         r.employee_id = emp_id;
         r.name        = name;
         r.role        = role;
         hr_svc->addHRStaff(r);
 
-        // ── Step 3: record SALARY_INIT transaction ────────────────────────────
+        // ── Step 3: record SALARY_INIT transaction 
         std::ostringstream desc;
         desc << "Salary init: " << name
              << " (ID:" << emp_id << ")"
@@ -183,7 +184,7 @@ int hrStaffAdd(const Args& args)
                   << color::RESET << "\n";
         if (tx_svc)
             std::cout << color::GREY
-                      << "  → Transaction recorded (SALARY_INIT, $"
+                      << "  Transaction recorded (SALARY_INIT, $"
                       << std::fixed << std::setprecision(2) << salary << ")\n"
                       << color::RESET;
 
@@ -212,7 +213,7 @@ int hrStaffList(const Args& args)
     return 0;
 }
 
-// ── Manager: Vacancy ──────────────────────────────────────────────────────────
+// ── Manager: Vacancy 
 
 int vacancyCreate(const Args& args)
 {
@@ -227,7 +228,7 @@ int vacancyCreate(const Args& args)
 
     try {
         svc->createVacancy(v);
-        std::cout << color::GREEN << "✓ Vacancy created" << color::RESET << "\n";
+        std::cout << color::GREEN << " Vacancy created" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
@@ -266,16 +267,14 @@ int vacancyClose(const Args& args)
 
     try {
         svc->closeVacancy(std::stoll(id_str));
-        std::cout << color::GREEN << "✓ Vacancy closed" << color::RESET << "\n";
+        std::cout << color::GREEN << "Vacancy closed" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
     return 0;
 }
 
-// ── Manager: Leave decision ───────────────────────────────────────────────────
-// When approved — callback fires → HRService::markGrantedLeave()
-// No salary transaction here; leave is unpaid-leave-neutral in this model.
+// ── Manager: Leave decision 
 
 int managerLeaveDecide(const Args& args)
 {
@@ -309,11 +308,11 @@ int managerLeaveDecide(const Args& args)
             [&hr_svc](i64 employee_id, const std::string& from, const std::string& to) {
                 hr_svc->markGrantedLeave(employee_id, from, to);
                 std::cout << color::GREY
-                          << "  → Attendance log updated with GRANTED_LEAVE"
+                          << "  Attendance log updated with GRANTED_LEAVE"
                           << color::RESET << "\n";
             });
 
-        std::cout << color::GREEN << "✓ Leave request updated" << color::RESET << "\n";
+        std::cout << color::GREEN << " Leave request updated" << color::RESET << "\n";
 
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
@@ -321,11 +320,7 @@ int managerLeaveDecide(const Args& args)
     return 0;
 }
 
-// ── Manager: Raise decision ───────────────────────────────────────────────────
-// When APPROVED:
-//   1. Callback updates the employee's salary in the DB (existing behaviour).
-//   2. We additionally record a SALARY_ADJUSTMENT transaction for the raise delta.
-//      This makes the raise visible in `farmos tx list`.
+// ── Manager: Raise decision 
 
 int managerRaiseDecide(const Args& args)
 {
@@ -334,7 +329,7 @@ int managerRaiseDecide(const Args& args)
     if (!requireRole(state, HRRole::MANAGER)) return 1;
 
     auto* emp_svc = state->getEmployeeService();
-    auto* tx_svc  = state->getTransactionService();  // may be nullptr — handled gracefully
+    auto* tx_svc  = state->getTransactionService();
     if (!emp_svc) { color::printError("Employee service unavailable"); return 1; }
 
     std::string id_str;
@@ -356,24 +351,19 @@ int managerRaiseDecide(const Args& args)
         RaiseStatus decision = wx::selectInput<RaiseStatus>(
             "Decision:", emp::RaiseStatusStrs, 3, emp::strToRaiseStatus);
 
-        // Capture employee name for the transaction description
         std::string emp_name = "Unknown";
         try {
             EmployeeRecord e = emp_svc->getEmployeeById(req.employee_id);
             emp_name = e.name;
         } catch (...) {}
 
-        // on_approved callback → salary updated in DB (existing behaviour)
         emp_svc->updateRaiseStatus(rid, decision,
             [&emp_svc, &tx_svc, &emp_name, &req](i64 employee_id, f64 new_salary) {
-                // 1. Update salary in employee record
                 emp_svc->updateSalary(employee_id, new_salary);
                 std::cout << color::GREY
-                          << "  → Salary updated to $" << new_salary
+                          << "  Salary updated to $" << new_salary
                           << color::RESET << "\n";
 
-                // 2. Record the raise delta as a SALARY_ADJUSTMENT transaction
-                //    Description: "Salary raise: Alice (ID:3) | +500.00 (approved raise)"
                 std::ostringstream desc;
                 desc << "Salary raise: " << emp_name
                      << " (ID:" << employee_id << ")"
@@ -392,7 +382,7 @@ int managerRaiseDecide(const Args& args)
                           << color::RESET;
             });
 
-        std::cout << color::GREEN << "✓ Raise request updated" << color::RESET << "\n";
+        std::cout << color::GREEN << " Raise request updated" << color::RESET << "\n";
 
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
@@ -400,7 +390,7 @@ int managerRaiseDecide(const Args& args)
     return 0;
 }
 
-// ── Applicant ─────────────────────────────────────────────────────────────────
+// ── Applicant 
 
 int applicantApply(const Args& args)
 {
@@ -429,7 +419,7 @@ int applicantApply(const Args& args)
 
     try {
         svc->addApplicant(a);
-        std::cout << color::GREEN << "✓ Application submitted" << color::RESET << "\n";
+        std::cout << color::GREEN << "Application submitted" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
@@ -455,9 +445,7 @@ int applicantList(const Args& args)
     return 0;
 }
 
-// ── HiringOfficer ─────────────────────────────────────────────────────────────
-// After hiring, records a SALARY_INIT transaction for the employee's starting
-// salary so it appears in the transaction ledger from day one.
+// ── HiringOfficer 
 
 int hiringOfficerHire(const Args& args)
 {
@@ -476,7 +464,6 @@ int hiringOfficerHire(const Args& args)
     try {
         i64 aid = std::stoll(id_str);
 
-        // ── Show applicant summary ────────────────────────────────────────────
         ApplicantRecord a = hr_svc->getApplicantById(aid);
         std::cout << color::BLUE << "\n  Hiring: " << a.name
                   << " (applicant #" << aid << ")" << color::RESET << "\n";
@@ -484,7 +471,6 @@ int hiringOfficerHire(const Args& args)
         printApplicant(a, false);
         color::printSeperator();
 
-        // ── Step 1: Name (pre-filled from applicant, officer can correct) ─────
         std::cout << color::GREY << "  Pre-filled from application. Press Enter to keep, or type to override.\n"
                   << color::RESET;
         std::cout << color::GREEN << "Full Name [" << a.name << "]: " << color::RESET;
@@ -492,21 +478,17 @@ int hiringOfficerHire(const Args& args)
         std::getline(std::cin, name_input);
         std::string final_name = name_input.empty() ? a.name : name_input;
 
-        // ── Step 2: Department ────────────────────────────────────────────────
         EmployeeDepartment dept = wx::selectInput<EmployeeDepartment>(
             "Department:", emp::DepartmentStrs, 2, emp::strToDept);
 
-        // ── Step 3: Starting salary ───────────────────────────────────────────
         f64 salary = wx::lineInput<double>("Starting Salary: $");
         if (salary <= 0) {
             color::printError("Salary must be greater than 0");
             return 1;
         }
 
-        // ── Step 4: Join date ─────────────────────────────────────────────────
         std::string jdate = wx::lineInput<std::string>("Join Date (YYYY-MM-DD): ");
 
-        // ── Confirm before writing ────────────────────────────────────────────
         std::cout << color::BLUE << "\n  Confirm new employee record:\n" << color::RESET;
         color::printSeperator();
         std::cout << "  Name       : " << final_name             << "\n"
@@ -523,19 +505,14 @@ int hiringOfficerHire(const Args& args)
             return 0;
         }
 
-        // ── Hire: mark applicant SELECTED, vacancy FILLED ────────────────────
         EmployeeRecord emp = hr_svc->hireApplicant(aid, salary, jdate);
-
-        // Override fields with what the officer entered
         emp.name       = final_name;
         emp.department = dept;
         emp.salary     = salary;
         emp.joined_at  = jdate;
 
-        // ── Persist employee record ───────────────────────────────────────────
         emp_svc->addEmployee(emp);
 
-        // Fetch back the auto-assigned employee_id
         i64 new_emp_id = 0;
         try {
             auto all_emps = emp_svc->getAllEmployees();
@@ -543,7 +520,7 @@ int hiringOfficerHire(const Args& args)
         } catch (...) {}
 
         std::cout << color::GREEN
-                  << "\n  ✓ Employee added"
+                  << "\n  Employee added"
                   << "\n    Name       : " << emp.name
                   << "\n    ID         : " << new_emp_id
                   << "\n    Department : " << emp::toStr(emp.department)
@@ -551,7 +528,6 @@ int hiringOfficerHire(const Args& args)
                   << "\n    Joined     : " << emp.joined_at
                   << color::RESET << "\n";
 
-        // ── Record SALARY_INIT transaction ────────────────────────────────────
         std::ostringstream desc;
         desc << "Salary init: " << emp.name
              << " (ID:" << new_emp_id << ")"
@@ -563,7 +539,7 @@ int hiringOfficerHire(const Args& args)
 
         if (tx_svc)
             std::cout << color::GREY
-                      << "  → Transaction recorded (SALARY_INIT, $"
+                      << "  Transaction recorded (SALARY_INIT, $"
                       << std::fixed << std::setprecision(2) << salary << ")\n"
                       << color::RESET;
 
@@ -585,10 +561,10 @@ int hiringOfficerReject(const Args& args)
     loadArg(id_str, 0, "applicant_id");
 
     try {
-        i64 aid = std::stoll(id_str);;
+        i64 aid = std::stoll(id_str);
         ApplicantRecord a = svc->getApplicantById(aid);
         svc->updateApplicantStatus(aid, ApplicantStatus::REJECTED);
-        std::cout << color::GREEN << "✓ Applicant rejected: "
+        std::cout << color::GREEN << "Applicant rejected: "
                   << a.name << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
@@ -596,7 +572,7 @@ int hiringOfficerReject(const Args& args)
     return 0;
 }
 
-// ── AttendanceOfficer ─────────────────────────────────────────────────────────
+// ── AttendanceOfficer 
 
 int attendanceMark(const Args& args)
 {
@@ -618,7 +594,7 @@ int attendanceMark(const Args& args)
         r.note        = wx::lineInput<std::string>("Note (optional, press Enter to skip): ");
 
         svc->markAttendance(r);
-        std::cout << color::GREEN << "✓ Attendance marked" << color::RESET << "\n";
+        std::cout << color::GREEN << " Attendance marked" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
@@ -671,7 +647,7 @@ int attendanceByDate(const Args& args)
     return 0;
 }
 
-// ── Manager: Delete Employee ──────────────────────────────────────────────────
+// ── Manager: Delete Employee 
 
 int managerDeleteEmployee(const Args& args)
 {
@@ -691,7 +667,7 @@ int managerDeleteEmployee(const Args& args)
                   << e.name << " [" << emp::toStr(e.department) << "]"
                   << color::RESET << "\n";
         emp_svc->deleteEmployee(eid);
-        std::cout << color::GREEN << "✓ Employee deleted" << color::RESET << "\n";
+        std::cout << color::GREEN << "Employee deleted" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }
