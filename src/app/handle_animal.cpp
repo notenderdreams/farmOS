@@ -24,9 +24,9 @@ static void printAnimal(const AnimalRecord& r, bool show_separator = true)
     std::cout << "\tStatus:  " << anim::toStr(r.status)  << "\n";
     std::cout << "\tAge:     " << r.age    << " yr\n";
     std::cout << "\tWeight:  " << r.weight << " kg\n";
-    std::cout << "\tMilk:    " << r.milk   << " L\n";
-    std::cout << "\tEggs:    " << r.eggs   << "\n";
-    std::cout << "\tMeat:    " << r.meat   << " kg\n";
+    // std::cout << "\tMilk:    " << r.milk   << " L\n";
+    // std::cout << "\tEggs:    " << r.eggs   << "\n";
+    // std::cout << "\tMeat:    " << r.meat   << " kg\n";
 
     if (show_separator)
         color::printSeperator();
@@ -93,7 +93,7 @@ int animalBuy(const Args& args)
         tx_service->addTransaction(tx);
 
         std::cout << color::GREEN
-                  << "✓ Animal purchased and transaction recorded"
+                  << "Animal purchased and transaction recorded"
                   << color::RESET << "\n";
 
     } catch (const std::exception& e) {
@@ -148,7 +148,7 @@ int animalSell(const Args& args)
         tx_service->addTransaction(tx);
 
         std::cout << color::GREEN
-                  << "✓ Animal sold and transaction recorded"
+                  << "Animal sold and transaction recorded"
                   << color::RESET << "\n";
 
     } catch (const std::exception& e) {
@@ -270,7 +270,7 @@ int animalUpdateStatus(const Args& args)
         );
 
         animal_service->updateStatus(aid, new_status);
-        std::cout << color::GREEN << "✓ Animal status updated" << color::RESET << "\n";
+        std::cout << color::GREEN << "Animal status updated" << color::RESET << "\n";
 
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to update animal status: ") + e.what());
@@ -298,7 +298,7 @@ int animalDelete(const Args& args)
     try {
         i64 aid = std::stoll(id_str);
         animal_service->deleteAnimal(aid);
-        std::cout << color::GREEN << "✓ Animal deleted" << color::RESET << "\n";
+        std::cout << color::GREEN << "Animal deleted" << color::RESET << "\n";
 
     } catch (const std::exception& e) {
         color::printError(std::string("Failed to delete animal: ") + e.what());
