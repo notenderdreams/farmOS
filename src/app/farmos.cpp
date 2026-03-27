@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
     cli.registerState(new AppState("../../farm.db"));
 
     REG_MOD(cli, tx, "Transaction management") {
-        ADD_CMD(add,    "Add a new transaction",     txAdd);
+        // ADD_CMD(add,    "Add a new transaction",     txAdd);
         ADD_CMD(list,   "List all transactions",     txList);
         ADD_CMD(show,   "Show transaction details",  txShow);
         ADD_CMD(status, "Update transaction status", txUpdateStatus);
