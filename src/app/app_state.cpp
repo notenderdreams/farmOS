@@ -7,13 +7,15 @@ AppState::AppState(const std::string& db_path)
       _tx_service(nullptr),
       _animal_service(nullptr),
       _employee_service(nullptr),
-      _hr_service(nullptr) {}
+      _hr_service(nullptr),
+      _inv_service(nullptr) {}
 
 AppState::~AppState() {
     delete _tx_service;
     delete _animal_service;
     delete _employee_service;
     delete _hr_service;
+    delete _inv_service;
 }
 
 TransactionService* AppState::getTransactionService() {
@@ -33,6 +35,16 @@ void AppState::ensureAnimalService() {
     if (!_animal_service) {
         try { _animal_service = new AnimalService(_db_path); _animal_service->initTable(); }
         catch (const std::exception& e) { color::printError(std::string("Animal service: ") + e.what()); }
+    }
+}
+
+InventoryService* AppState::getInventoryService() {
+    ensureInventoryService(); return _inv_service;
+}
+void AppState::ensureInventoryService() {
+    if (!_inv_service) {
+        try { _inv_service = new InventoryService(_db_path); _inv_service->initTable(); }
+        catch (const std::exception& e) { color::printError(std::string("Inventory service: ") + e.what()); }
     }
 }
 
