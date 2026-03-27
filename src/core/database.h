@@ -16,6 +16,8 @@ public:
     sqlite3_stmt* prepare(const std::string& sql);
     virtual void initTable() = 0;
 
+    virtual void initTable() = 0;
+
 protected:
     sqlite3* db;
 };

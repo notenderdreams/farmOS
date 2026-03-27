@@ -6,7 +6,7 @@ add_executable(farmos
     handle_accountant.cpp
     handle_employee.cpp
     handle_hr.cpp
-    
+    handle_inventory.cpp
 )
 
 target_include_directories(farmos

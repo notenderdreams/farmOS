@@ -10,7 +10,7 @@ public:
     InventoryService(sqlite3* db);
     InventoryService(const std::string& db_path);
 
-    void initTable();
+    void initTable() override;
 
     void addItem(const Inventory& item);
     std::vector<Inventory> getAllItems();

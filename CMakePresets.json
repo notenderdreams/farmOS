@@ -6,8 +6,13 @@
       "displayName": "Default Config",
       "description": "Default build using Unix Makefiles",
       "generator": "Unix Makefiles",
+      "description": "Default build using MSYS Makefiles",
+      "generator": "MSYS Makefiles",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_MAKE_PROGRAM": "C:/msys64/usr/bin/make.exe",
+        "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe"
       },
       "binaryDir": "${sourceDir}/build"
     },
@@ -16,8 +21,12 @@
       "displayName": "Release Config",
       "description": "Release build optimized for performance",
       "generator": "Unix Makefiles",
+      "generator": "MSYS Makefiles",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_MAKE_PROGRAM": "C:/msys64/usr/bin/make.exe",
+        "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe"
       },
       "binaryDir": "${sourceDir}/build-release"
     }
