@@ -199,7 +199,7 @@ int employeeAskRaise(const Args& args)
         r.reason         = wx::lineInput<std::string>("Reason: ");
 
         svc->askRaise(r);
-        std::cout << color::GREEN << "✓ Raise request submitted" << color::RESET << "\n";
+        std::cout << color::GREEN << "Raise request submitted" << color::RESET << "\n";
     } catch (const std::exception& e) {
         color::printError(e.what()); return 1;
     }

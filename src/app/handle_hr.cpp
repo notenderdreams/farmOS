@@ -175,7 +175,7 @@ int hrStaffAdd(const Args& args)
                           std::to_string(emp_id));
 
         std::cout << color::GREEN
-                  << "\n  ✓ HR staff member added"
+                  << "\n    HR staff member added"
                   << "\n    Name        : " << name
                   << "\n    Employee ID : " << emp_id
                   << "\n    Role        : " << hr::toStr(role)
